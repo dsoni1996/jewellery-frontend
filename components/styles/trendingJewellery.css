@@ -1,0 +1,15 @@
+.trending-jewellery-container {
+  display: block;
+  display: grid;
+  grid-template-columns: auto auto auto;
+  gap: 10px;
+}
+
+
+@media screen and (max-width: 1000px) {
+   .trending-jewellery-container {
+     gap: 0 !important
+   }
+}
+
+

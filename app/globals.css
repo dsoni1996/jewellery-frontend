@@ -1,0 +1,36 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --color-cream: #FFFDF9;
+  --color-bg: #FAF6F0;
+  --color-dark: #2C1A0E;
+  --color-brown: #4A3728;
+  --color-gold: #B8862A;
+  --color-gold-light: #D4AF6A;
+  --color-border: #E8DDD0;
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'Jost', sans-serif;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-sans);
+  background: var(--color-bg);
+  color: var(--color-dark);
+  -webkit-font-smoothing: antialiased;
+  padding-top: 110px; /* space for fixed navbar */
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--color-bg); }
+::-webkit-scrollbar-thumb { background: var(--color-gold); border-radius: 3px; }
+
+/* Selection */
+::selection { background: rgba(184,134,42,0.2); color: var(--color-dark); }
+
+/* Headings */
+h1, h2, h3 { font-family: var(--font-serif); font-weight: 400; }

@@ -1,0 +1,126 @@
+.root {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: white;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+}
+
+.header-inner {
+  max-width: 1320px;
+  margin: 0 auto;
+  /* padding: 12px; */
+  min-height: 4rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+@media (max-width: 789px) {
+  .header-inner {
+    padding-right: 24px;
+  }
+}
+
+.icons {
+  height: 24px;
+  width: 24px;
+}
+
+.iconContainer {
+  display: flex;
+  gap: 2rem;
+}
+
+.header-icons {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+.header-icons svg {
+  width: 24px;
+  height: 24px;
+  stroke-width: 1.5;
+  color: #3a2d2d;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    color 0.2s ease;
+}
+
+.header-icons svg:hover {
+  transform: scale(1.1);
+  color: #a67c52;
+}
+
+/* Cart Badge */
+.cart {
+  position: relative;
+}
+
+.badge {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  background: #000;
+  color: #fff;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 50%;
+  font-weight: 600;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  height: 40px;
+  width: auto;
+  cursor: pointer;
+}
+
+.user-wrapper {
+  position: relative;
+}
+
+/* POPUP */
+.userPopover {
+  position: absolute;
+  /* top: 42px; */
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.18);
+  padding: 12px;
+  min-width: 220px;
+  z-index: 100;
+}
+
+.userPopover ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* ITEMS */
+.userPopover li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+.userPopover li:hover {
+  border: 1px solid #000;
+}
+

@@ -1,0 +1,13 @@
+.productListContainer {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+@media (max-width: 768px) {
+  .productListContainer {
+    grid-template-columns: repeat(2, 1fr);
+    display: grid;
+    gap: 12px;
+  }
+}

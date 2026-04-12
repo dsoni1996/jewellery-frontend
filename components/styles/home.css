@@ -1,0 +1,72 @@
+.hero-swiper {
+  width: 100%;
+  padding: 40px 0;
+  overflow: hidden;
+}
+
+.hero-swiper .swiper {
+  width: 90%;
+  margin: auto;
+  overflow: visible;
+}
+
+.hero-swiper .swiper-slide {
+  border-radius: 20px;
+  overflow: hidden;
+  transition: all 0.4s ease;
+  opacity: 0.6;
+}
+
+.hero-swiper .swiper-slide-active {
+  transform: scale(1);
+  opacity: 1;
+  z-index: 2;
+}
+
+.hero-swiper .swiper-slide img {
+  width: 100%;
+  /* height: 480px; */
+  height: 70vh;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.hero-swiper .swiper-pagination-bullet {
+  background: transparent !important;
+}
+
+.hero-swiper .swiper-pagination {
+  /* bottom: inherit; */
+  position: relative;
+  margin-top: 20px;
+  bottom: auto;
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+}
+
+.hero-swiper .diamond-icon {
+  width: 16px;
+  height: 16px;
+  fill: #832729;
+}
+
+.tanishq-grid {
+  height: 800px;
+}
+
+@media (max-width: 768px) {
+  .tanishq-grid {
+    height: 70vh;
+  }
+
+  .hero-swiper {
+    .swiper {
+      width: 100%;
+      overflow: hidden;
+    }
+    .swiper-slide img {
+      height: 60vh;
+    }
+  }
+}

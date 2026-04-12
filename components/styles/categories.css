@@ -1,0 +1,24 @@
+.contianer {
+  display: grid;
+  grid-template-columns: repeat(4, auto);
+  gap: 22px;
+}
+
+
+.swiper-grid-wrapper {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .contianer {
+    grid-template-columns: repeat(1, auto);
+    display: none;
+  }
+
+  .swiper-grid-wrapper {
+    display: block;
+  }
+}
+
+
+
