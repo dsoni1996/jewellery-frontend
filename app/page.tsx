@@ -42,7 +42,7 @@ function Skeleton() {
 }
 
 export default function Home() {
-  const [sections, setSections] = useState(null);
+  const [sections, setSections] = useState<any[] | null>(null);
 
   useEffect(() => {
     homeSectionApi.getHome()
@@ -65,7 +65,8 @@ export default function Home() {
   return (
     <>
       {sections.map(section => {
-        const Component = SECTION_MAP[section.type];
+        const type = section.type as keyof typeof SECTION_MAP;
+        const Component = SECTION_MAP[type];
         if (!Component) return null;
         return (
           <Component

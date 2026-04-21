@@ -110,6 +110,14 @@ export default function CartPage() {
     setCoupon(""); setCouponMsg(""); setCouponErr("");
   };
 
+     if (loading) {
+    return (
+      <div className="wl-root" style={{ display:'flex', alignItems:'center', justifyContent:'center' }}>
+        <Loader2 className="spin" />
+      </div>
+    );
+  }
+
   if (!isLoggedIn) return (
     <>
       <style>{styles}</style>

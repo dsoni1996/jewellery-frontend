@@ -341,7 +341,7 @@ const S = `
 .wb-gold-line{height:1px;background:linear-gradient(90deg,transparent,#B8862A 20%,#E8C96A 50%,#B8862A 80%,transparent);}
 
 /* FILTER */
-.wb-filter-strip{background:#2C1A0E;position:sticky;top:0;z-index:30;border-bottom:1px solid rgba(184,134,42,.3);box-shadow:0 4px 24px rgba(0,0,0,.25);}
+.wb-filter-strip{background:#2C1A0E;position:sticky;top:120px;z-index:30;border-bottom:1px solid rgba(184,134,42,.3);box-shadow:0 4px 24px rgba(0,0,0,.25);}
 .wb-filter-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;overflow-x:auto;scrollbar-width:none;}
 .wb-filter-inner::-webkit-scrollbar{display:none;}
 .wb-filter-btn{flex-shrink:0;background:none;border:none;padding:18px 28px;font-family:'Jost',sans-serif;font-size:11px;font-weight:400;letter-spacing:2px;text-transform:uppercase;color:#7A6352;cursor:pointer;position:relative;transition:color .2s;white-space:nowrap;}

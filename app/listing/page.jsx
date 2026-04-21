@@ -28,7 +28,7 @@ const listingStyles = `
   .pl-gold-line { height: 1px; background: linear-gradient(90deg, transparent, #B8862A 20%, #E8C96A 50%, #B8862A 80%, transparent); }
 
   /* ── Filter bar ── */
-  .pl-filter-wrap { background: #fff; border-bottom: 1px solid #EDE4D8; padding: 14px 40px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; font-family: 'Jost', sans-serif; font-size: 12px; position: sticky; top: 0; z-index: 20; }
+  .pl-filter-wrap { background: #fff; border-bottom: 1px solid #EDE4D8; padding: 14px 40px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; font-family: 'Jost', sans-serif; font-size: 12px; position: sticky; top: 90px; z-index: 20; }
   .pl-filter-group { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
   .pl-filter-select { border: 1px solid #D4C4B0; color: #4A3728; padding: 7px 14px; font-size: 11px; letter-spacing: 1px; cursor: pointer; font-family: 'Jost', sans-serif; background: #fff; outline: none; border-radius: 2px; transition: border-color .2s; }
   .pl-filter-select:focus { border-color: #B8862A; }
