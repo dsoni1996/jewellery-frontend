@@ -43,7 +43,7 @@ const pageStyles = `
 const ProductPage = async ({ params }) => {
   const { slug } = await params;
 
-  const { product } = await api.products.getOne(slug);
+  const { product } = await api.product.getOne(slug);
 
   return (
     <>

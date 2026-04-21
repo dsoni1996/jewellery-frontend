@@ -21,7 +21,7 @@ body {
   background: var(--color-bg);
   color: var(--color-dark);
   -webkit-font-smoothing: antialiased;
-  padding-top: 110px; /* space for fixed navbar */
+  padding-top: 100px; /* space for fixed navbar */
 }
 
 /* Scrollbar */

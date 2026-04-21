@@ -7,27 +7,34 @@ import "swiper/css/effect-fade";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
-const slides = [
+/* ── Default slides (used when no settings from API) ── */
+const DEFAULT_SLIDES = [
   {
-    img: "https://www.tanishq.co.in/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dw3fd145e1/homepage/tanishq-collections/sparkling-desktop.jpg",
-    tag: "New Collection",
-    title: "Sparkling <em>Avenues</em>",
-    sub: "Diamonds that dazzle, designs that endure",
-    cta: "Explore Now",
+    img:      "https://www.tanishq.co.in/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dw3fd145e1/homepage/tanishq-collections/sparkling-desktop.jpg",
+    eyebrow:  "New Collection",
+    title:    "Sparkling",
+    titleEm:  "Avenues",
+    subtitle: "Diamonds that dazzle, designs that endure",
+    ctaLabel: "Explore Now",
+    ctaHref:  "/listing",
   },
   {
-    img: "https://www.tanishq.co.in/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dwfba22b76/homepage/tanishq-collections/stunning-every-ear.jpg",
-    tag: "Earring Edit",
-    title: "Stunning <em>Every Ear</em>",
-    sub: "Crafted to perfection, worn with pride",
-    cta: "Shop Earrings",
+    img:      "https://www.tanishq.co.in/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dwfba22b76/homepage/tanishq-collections/stunning-every-ear.jpg",
+    eyebrow:  "Earring Edit",
+    title:    "Stunning",
+    titleEm:  "Every Ear",
+    subtitle: "Crafted to perfection, worn with pride",
+    ctaLabel: "Shop Earrings",
+    ctaHref:  "/listing?category=Earring",
   },
   {
-    img: "https://www.tanishq.co.in/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dw96c93899/homepage/tanishq-collections/ganesh-chaturthi.jpg",
-    tag: "Festival Special",
-    title: "Celebrate <em>Every Moment</em>",
-    sub: "Gold jewellery for life's most precious occasions",
-    cta: "Discover More",
+    img:      "https://www.tanishq.co.in/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dw96c93899/homepage/tanishq-collections/ganesh-chaturthi.jpg",
+    eyebrow:  "Festival Special",
+    title:    "Celebrate",
+    titleEm:  "Every Moment",
+    subtitle: "Gold jewellery for life's most precious occasions",
+    ctaLabel: "Discover More",
+    ctaHref:  "/listing",
   },
 ];
 
@@ -39,8 +46,7 @@ const heroStyles = `
   .hero-slide img { width: 100%; height: 88vh; min-height: 520px; object-fit: cover; display: block; filter: brightness(0.82); transition: transform 8s ease; }
   .swiper-slide-active .hero-slide img { transform: scale(1.04); }
   .hero-overlay { position: absolute; inset: 0; background: linear-gradient(to right, rgba(20,10,2,0.72) 0%, rgba(20,10,2,0.3) 60%, transparent 100%); display: flex; align-items: center; }
-  .hero-content { padding: 0 80px; max-width: 600px; animation: hero-in 0.8s ease forwards; }
-  @keyframes hero-in { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+  .hero-content { padding: 0 80px; max-width: 600px; }
   .hero-tag { font-family: 'Jost', sans-serif; font-size: 10px; font-weight: 400; letter-spacing: 3.5px; text-transform: uppercase; color: #D4AF6A; margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
   .hero-tag::before { content: ''; display: block; width: 28px; height: 1px; background: #D4AF6A; }
   .hero-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(40px, 5vw, 68px); font-weight: 300; color: #FFFDF9; line-height: 1.1; margin-bottom: 16px; }
@@ -48,23 +54,25 @@ const heroStyles = `
   .hero-sub { font-family: 'Jost', sans-serif; font-size: 14px; font-weight: 300; color: #C8B89A; letter-spacing: 0.5px; margin-bottom: 36px; line-height: 1.6; }
   .hero-cta { display: inline-flex; align-items: center; gap: 10px; background: transparent; border: 1px solid #D4AF6A; color: #D4AF6A; font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 500; letter-spacing: 2.5px; text-transform: uppercase; padding: 14px 32px; cursor: pointer; text-decoration: none; transition: all 0.3s; }
   .hero-cta:hover { background: #D4AF6A; color: #2C1A0E; }
-  .hero-cta-arrow { transition: transform 0.3s; font-size: 14px; }
-  .hero-cta:hover .hero-cta-arrow { transform: translateX(4px); }
-  /* Pagination */
   .hero-root .swiper-pagination { bottom: 28px !important; }
   .hero-root .swiper-pagination-bullet { width: 6px; height: 6px; background: rgba(255,255,255,0.4); opacity: 1; transition: all 0.3s; border-radius: 50%; }
   .hero-root .swiper-pagination-bullet-active { background: #D4AF6A; width: 24px; border-radius: 3px; }
-  /* Scroll indicator */
-  .hero-scroll { position: absolute; bottom: 36px; right: 60px; z-index: 10; display: flex; flex-direction: column; align-items: center; gap: 6px; color: rgba(255,255,255,0.5); font-family: 'Jost', sans-serif; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; animation: bounce 2s infinite; }
+  .hero-scroll { position: absolute; bottom: 36px; right: 60px; z-index: 10; display: flex; flex-direction: column; align-items: center; gap: 6px; color: rgba(255,255,255,0.5); font-family: 'Jost', sans-serif; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; }
   .hero-scroll-line { width: 1px; height: 40px; background: linear-gradient(to bottom, #D4AF6A, transparent); }
-  @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
   @media (max-width: 768px) { .hero-slide img { height: 60vh; } .hero-content { padding: 0 24px; } .hero-scroll { display: none; } }
 `;
 
-const HeroCarousel = () => {
+const HeroCarousel = ({ settings = {} }) => {
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
   if (!mounted) return <div style={{ height: "88vh", background: "#1A0D05" }} />;
+
+  /* Use API slides if provided, else fallback to defaults */
+  const slides = (settings.slides && settings.slides.length > 0)
+    ? settings.slides
+    : DEFAULT_SLIDES;
+
+  const delay = settings.autoplayDelay || 4500;
 
   return (
     <>
@@ -75,20 +83,22 @@ const HeroCarousel = () => {
           effect="fade"
           slidesPerView={1}
           loop
-          autoplay={{ delay: 4500, disableOnInteraction: false }}
+          autoplay={{ delay, disableOnInteraction: false }}
           pagination={{ clickable: true }}
         >
           {slides.map((slide, i) => (
             <SwiperSlide key={i}>
               <div className="hero-slide">
-                <img src={slide.img} alt={slide.title} />
+                <img src={slide.img} alt={slide.eyebrow || slide.tag || "slide"} />
                 <div className="hero-overlay">
-                  <div className="hero-content" key={i}>
-                    <p className="hero-tag">{slide.tag}</p>
-                    <h1 className="hero-title" dangerouslySetInnerHTML={{ __html: slide.title }} />
-                    <p className="hero-sub">{slide.sub}</p>
-                    <Link href="/listing" className="hero-cta">
-                      {slide.cta} <span className="hero-cta-arrow">→</span>
+                  <div className="hero-content">
+                    <p className="hero-tag">{slide.eyebrow || slide.tag}</p>
+                    <h1 className="hero-title">
+                      {slide.title} {slide.titleEm && <><br /><em>{slide.titleEm}</em></>}
+                    </h1>
+                    <p className="hero-sub">{slide.subtitle || slide.sub}</p>
+                    <Link href={slide.ctaHref || slide.href || "/listing"} className="hero-cta">
+                      {slide.ctaLabel || slide.cta || "Explore Now"} <span>→</span>
                     </Link>
                   </div>
                 </div>

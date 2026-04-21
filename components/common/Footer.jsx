@@ -4,7 +4,7 @@ const footerStyles = `
   .ft-gold-line { height: 2px; background: linear-gradient(90deg, transparent, #B8862A 20%, #E8C96A 50%, #B8862A 80%, transparent); }
   .ft-top { max-width: 1400px; margin: 0 auto; padding: 60px 40px 48px; display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr; gap: 48px; }
   .ft-brand { }
-  .ft-logo { font-family: 'Cormorant Garamond', serif; font-size: 30px; font-weight: 600; color: #FFFDF9; letter-spacing: 5px; text-transform: uppercase; margin-bottom: 16px; display: block; }
+  .ft-logo { font-family: 'Cormorant Garamond', serif; font-size: 30px; font-weight: 600; color: #FFFDF9; letter-spacing: 5px; text-transform: uppercase; margin-bottom: 16px; display: block; text-decoration: none; }
   .ft-logo span { color: #D4AF6A; }
   .ft-tagline { font-size: 13px; font-weight: 300; line-height: 1.7; color: #9E8875; margin-bottom: 24px; max-width: 240px; }
   .ft-social { display: flex; gap: 12px; margin-bottom: 28px; }
@@ -31,19 +31,69 @@ const footerStyles = `
   @media (max-width: 600px) { .ft-top { grid-template-columns: 1fr; padding: 40px 20px 32px; } .ft-bottom { padding: 16px 20px; flex-direction: column; align-items: flex-start; } }
 `;
 
+const shopLinks = [
+  { label: "Gold Jewellery",      href: "listing?metal=Gold" },
+  { label: "Diamond Jewellery",   href: "listing?metal=Diamond" },
+  { label: "Wedding Collection",  href: "listing?category=Wedding" },
+  { label: "New Arrivals",        href: "listing?sort=new" },
+  { label: "Trending Now",        href: "listing?sort=trending" },
+];
+
+const helpLinks = [
+  { label: "Track My Order",      href: "/track-order" },
+  { label: "Returns & Exchanges", href: "/returns" },
+  { label: "Delivery Information",href: "/delivery" },
+  { label: "Payment Options",     href: "/payment-options" },
+  { label: "FAQ",                 href: "/faq" },
+];
+
+const companyLinks = [
+  { label: "About Us",      href: "/about" },
+  { label: "Store Locator", href: "/stores" },
+  { label: "Blog",          href: "/blog" },
+  { label: "Careers",       href: "/careers" },
+  { label: "Press",         href: "/press" },
+];
+
+const socialLinks = [
+  { label: "f",  href: "https://facebook.com/manasjewellers",  title: "Facebook" },
+  { label: "in", href: "https://instagram.com/manasjewellers", title: "Instagram" },
+  { label: "yt", href: "https://youtube.com/@manasjewellers",  title: "YouTube" },
+  { label: "tw", href: "https://twitter.com/manasjewellers",   title: "Twitter / X" },
+];
+
+const legalLinks = [
+  { label: "Terms & Conditions", href: "/terms" },
+  { label: "Privacy Policy",     href: "/privacy" },
+  { label: "Disclaimer",         href: "/disclaimer" },
+];
+
 const Footer = () => (
   <>
     <style>{footerStyles}</style>
     <footer className="ft-root">
       <div className="ft-gold-line" />
       <div className="ft-top">
+
         {/* Brand */}
         <div className="ft-brand">
-          <span className="ft-logo">MAN<span>A</span>S</span>
-          <p className="ft-tagline">Crafting timeless jewellery since 1985. BIS hallmarked gold, diamonds, and precious stones for every life moment.</p>
+          <a href="/" className="ft-logo">MAN<span>A</span>S</a>
+          <p className="ft-tagline">
+            Crafting timeless jewellery since 1985. BIS hallmarked gold, diamonds,
+            and precious stones for every life moment.
+          </p>
           <div className="ft-social">
-            {["f", "in", "yt", "tw"].map((s, i) => (
-              <a key={i} className="ft-social-btn">{s}</a>
+            {socialLinks.map((s, i) => (
+              <a
+                key={i}
+                className="ft-social-btn"
+                href={s.href}
+                title={s.title}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {s.label}
+              </a>
             ))}
           </div>
           <div className="ft-trust">
@@ -52,30 +102,32 @@ const Footer = () => (
           </div>
         </div>
 
-        {/* Links */}
+        {/* Shop */}
         <div className="ft-col">
           <p className="ft-col-title">Shop</p>
           <ul>
-            {["Gold Jewellery", "Diamond Jewellery", "Wedding Collection", "New Arrivals", "Trending Now"].map((item, i) => (
-              <li key={i}><a>{item}</a></li>
+            {shopLinks.map((item, i) => (
+              <li key={i}><a href={item.href}>{item.label}</a></li>
             ))}
           </ul>
         </div>
 
+        {/* Help */}
         <div className="ft-col">
           <p className="ft-col-title">Help</p>
           <ul>
-            {["Track My Order", "Returns & Exchanges", "Delivery Information", "Payment Options", "FAQ"].map((item, i) => (
-              <li key={i}><a>{item}</a></li>
+            {helpLinks.map((item, i) => (
+              <li key={i}><a href={item.href}>{item.label}</a></li>
             ))}
           </ul>
         </div>
 
+        {/* Company */}
         <div className="ft-col">
           <p className="ft-col-title">Company</p>
           <ul>
-            {["About Us", "Store Locator", "Blog", "Careers", "Press"].map((item, i) => (
-              <li key={i}><a>{item}</a></li>
+            {companyLinks.map((item, i) => (
+              <li key={i}><a href={item.href}>{item.label}</a></li>
             ))}
           </ul>
         </div>
@@ -84,10 +136,12 @@ const Footer = () => (
         <div className="ft-qr">
           <p className="ft-col-title">Download App</p>
           <p className="ft-qr-title">Scan to download the MANAS app</p>
-          <img
-            src="https://www.tanishq.co.in/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dw0fa1b94a/images/footer/tanishq-app-QR-code.svg"
-            alt="QR Code"
-          />
+          <a href="/app" title="Download MANAS App">
+            <img
+              src="https://www.tanishq.co.in/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dw0fa1b94a/images/footer/tanishq-app-QR-code.svg"
+              alt="QR Code – Download MANAS App"
+            />
+          </a>
         </div>
       </div>
 
@@ -101,9 +155,9 @@ const Footer = () => (
           ))}
         </div>
         <nav className="ft-legal">
-          <a>Terms & Conditions</a>
-          <a>Privacy Policy</a>
-          <a>Disclaimer</a>
+          {legalLinks.map((item, i) => (
+            <a key={i} href={item.href}>{item.label}</a>
+          ))}
         </nav>
       </div>
     </footer>

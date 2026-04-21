@@ -1,7 +1,7 @@
 "use client";
 import { ShoppingBag, MapPin, Phone } from "lucide-react";
 
-const ActionButtons = () => (
+const ActionButtons = ({ addToCart }) => (
   <>
     <style>{`
       @import url('https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&display=swap');
@@ -13,7 +13,7 @@ const ActionButtons = () => (
       .ab-btn-outline:hover { border-color: #B8862A; color: #B8862A; }
     `}</style>
     <div className="ab-group">
-      <button className="ab-btn-primary">
+      <button className="ab-btn-primary" onClick={addToCart}>
         <ShoppingBag size={15} /> Add to Cart
       </button>
       <div className="ab-btn-row">

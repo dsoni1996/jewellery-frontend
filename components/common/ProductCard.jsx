@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { Heart, ShoppingBag } from "lucide-react";
 import Link from "next/link";
+import api from "../../lib/api";
 
 const cardStyles = `
   @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Jost:wght@300;400;500&display=swap');
@@ -26,8 +27,50 @@ const cardStyles = `
 `;
 
 const ProductCard = ({ product }) => {
-  const { title, price, imgUrl } = product;
+  const { title, price, imgUrl, id , occasion} = product;
   const [wishlisted, setWishlisted] = useState(false);
+
+
+    const handleAddToCart = async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Login required");
+        return;
+      }
+
+      try {
+        await api.cart.add(id, 1);
+        alert("Added to cart ✅");
+      } catch (err) {
+        console.error(err);
+        alert("Failed to add to cart");
+      } finally {
+      }
+    };
+
+    const handleWishlist = async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Login required");
+        return;
+      }
+
+      try {
+        await api.wishlist.toggle(id, token);
+        setWishlisted((prev) => !prev);
+      } catch (err) {
+        console.error(err);
+        alert("Wishlist error");
+      }
+    };
+
+    console.log('product',product)
 
   return (
     <>
@@ -39,14 +82,20 @@ const ProductCard = ({ product }) => {
             className="pc-img"
             alt={title}
           />
-          <span className="pc-badge">NEW</span>
+          {occasion.map((accation, index) => (
+            <span className="pc-badge" key={index}>{accation}</span>
+          ))}
           <button
             className={`pc-wish${wishlisted ? " active" : ""}`}
-            onClick={(e) => { e.stopPropagation(); setWishlisted(!wishlisted); }}
+            onClick={(e) => handleWishlist(e)}
           >
-            <Heart size={14} fill={wishlisted ? "#c0392b" : "none"} color={wishlisted ? "#c0392b" : "#4A3728"} />
+            <Heart
+              size={14}
+              fill={wishlisted ? "#c0392b" : "none"}
+              color={wishlisted ? "#c0392b" : "#4A3728"}
+            />
           </button>
-          <button className="pc-quick-add">
+          <button className="pc-quick-add" onClick={handleAddToCart}>
             <ShoppingBag size={13} /> ADD TO BAG
           </button>
         </div>
@@ -54,9 +103,13 @@ const ProductCard = ({ product }) => {
           {title && (
             <>
               <p className="pc-title">{title}</p>
-              <p className="pc-meta">22 KT Gold &nbsp;·&nbsp; <span className="pc-gold-dot" /></p>
+              <p className="pc-meta">
+                22 KT Gold &nbsp;·&nbsp; <span className="pc-gold-dot" />
+              </p>
               <div className="pc-footer">
-                <span className="pc-price">{price ? `₹ ${Number(price).toLocaleString("en-IN")}` : "₹ —"}</span>
+                <span className="pc-price">
+                  {price ? `₹ ${Number(price).toLocaleString("en-IN")}` : "₹ —"}
+                </span>
                 <span className="pc-rating">★★★★☆</span>
               </div>
             </>

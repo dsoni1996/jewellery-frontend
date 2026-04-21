@@ -2,6 +2,7 @@
 import { FaHeart, FaShareAlt, FaRegCopy, FaCheck } from "react-icons/fa";
 import ActionButtons from "./ActionButtons";
 import { useState } from "react";
+import api from "@/lib/api";
 
 const infoStyles = `
   @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Jost:wght@300;400;500&display=swap');
@@ -40,6 +41,20 @@ const ProductInfo = ({ product }) => {
     navigator.clipboard?.writeText("JTXYA20-AENC014");
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
+  };
+
+
+  const addToCart = () => {
+    // Api call to add item to cart
+    api.cart
+      .add(product._id, 1)
+      .then(() => {
+        alert("Item added to cart!");
+      })
+      .catch((err) => {
+        console.error("Error adding to cart:", err);
+        alert("Failed to add item to cart. Please try again.");
+      });
   };
 
   return (
@@ -103,7 +118,7 @@ const ProductInfo = ({ product }) => {
           </div>
         </div>
 
-        <ActionButtons />
+        <ActionButtons addToCart={addToCart} />
 
         <div className="pi-trust">
           {[
