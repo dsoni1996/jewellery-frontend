@@ -35,7 +35,9 @@ const ProductCard = ({ product }) => {
       e.preventDefault();
       e.stopPropagation();
 
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("manas_token");
+
+      console.log('Adding to cart, token:', token)
       if (!token) {
         alert("Login required");
         return;
@@ -55,7 +57,7 @@ const ProductCard = ({ product }) => {
       e.preventDefault();
       e.stopPropagation();
 
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("manas_token");
       if (!token) {
         alert("Login required");
         return;

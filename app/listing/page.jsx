@@ -1,5 +1,6 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { Loader2, X } from "lucide-react";
 import ProductCard from "../../components/common/ProductCard";
 import { useProducts } from "../../hooks";
@@ -73,19 +74,44 @@ const listingStyles = `
   }
 `;
 
+// ── Helper: convert URLSearchParams → filters object ────────────────────────
+function searchParamsToFilters(searchParams) {
+  const filters = {};
+  const keys = ["category", "metal.purity", "sort", "minPrice", "maxPrice"];
+  keys.forEach(key => {
+    const val = searchParams.get(key);
+    if (val) filters[key] = val;
+  });
+  return filters;
+}
+
+// ── Helper: build URLSearchParams from filters + page ───────────────────────
+function buildSearchParams(filters, page) {
+  const params = new URLSearchParams();
+  Object.entries(filters).forEach(([key, val]) => {
+    if (val !== "" && val !== null && val !== undefined) {
+      params.set(key, val);
+    }
+  });
+  if (page > 1) params.set("page", String(page));
+  return params;
+}
+
 // ── Price filter with debounce + Enter key support ──────────────────────────
-function PriceFilter({ onApply }) {
-  const [min, setMin] = useState("");
-  const [max, setMax] = useState("");
+function PriceFilter({ initialMin = "", initialMax = "", onApply }) {
+  const [min, setMin] = useState(initialMin);
+  const [max, setMax] = useState(initialMax);
   const debounceRef   = useRef(null);
   const isDirty       = min !== "" || max !== "";
 
-  const apply = (minVal, maxVal) => {
-    onApply(minVal, maxVal);
-  };
+  // Sync if URL changes externally (e.g. back/forward nav)
+  useEffect(() => { setMin(initialMin); }, [initialMin]);
+  useEffect(() => { setMax(initialMax); }, [initialMax]);
 
-  const handleChange = (setter, otherVal, isMin) => (e) => {
-    const val = e.target.value.replace(/\D/g, ""); // numbers only
+  const apply = (minVal, maxVal) => onApply(minVal, maxVal);
+
+  const handleChange = (setter, isMin) => (e) => {
+    const val = e.target.value.replace(/\D/g, "");
     setter(val);
     clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
@@ -112,7 +138,7 @@ function PriceFilter({ onApply }) {
         className={`pl-price-input${isDirty ? " dirty" : ""}`}
         placeholder="Min ₹"
         value={min}
-        onChange={handleChange(setMin, max, true)}
+        onChange={handleChange(setMin, true)}
         onKeyDown={handleKeyDown}
         inputMode="numeric"
       />
@@ -121,7 +147,7 @@ function PriceFilter({ onApply }) {
         className={`pl-price-input${isDirty ? " dirty" : ""}`}
         placeholder="Max ₹"
         value={max}
-        onChange={handleChange(setMax, min, false)}
+        onChange={handleChange(setMax, false)}
         onKeyDown={handleKeyDown}
         inputMode="numeric"
       />
@@ -140,13 +166,49 @@ function PriceFilter({ onApply }) {
 
 // ── Main page ────────────────────────────────────────────────────────────────
 export default function ProductListing() {
-  const { products, total, pages, page, loading, filters, setPage, setFilters, updateFilter } = useProducts();
+  const router       = useRouter();
+  const pathname     = usePathname();
+  const searchParams = useSearchParams();
 
-  const activeCategory = filters.category      || "";
+  // ── 1. Read initial state from URL on first render ──
+  const initialFilters = searchParamsToFilters(searchParams);
+  const initialPage    = Number(searchParams.get("page")) || 1;
+
+  const {
+    products, total, pages, page, loading,
+    filters, setPage, setFilters, updateFilter,
+  } = useProducts({ ...initialFilters, page: initialPage });
+
+  // ── 2. Whenever filters or page change → push to URL ──
+  // isUpdatingUrl ref: marks that WE triggered the URL change,
+  // so Effect 3 doesn't echo it back as a state update (breaks the loop).
+  const isFirstRender  = useRef(true);
+  const isUpdatingUrl  = useRef(false);
+  useEffect(() => {
+    if (isFirstRender.current) { isFirstRender.current = false; return; }
+    const params = buildSearchParams(filters, page);
+    const query  = params.toString();
+    isUpdatingUrl.current = true;
+    router.replace(`${pathname}${query ? `?${query}` : ""}`, { scroll: false });
+  }, [filters, page]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── 3. Handle browser back/forward → sync state from URL ──
+  // Only runs when URL was changed externally (back/forward), not by us.
+  useEffect(() => {
+    if (isUpdatingUrl.current) {
+      isUpdatingUrl.current = false; // consume the flag, skip this run
+      return;
+    }
+    const fromUrl     = searchParamsToFilters(searchParams);
+    const pageFromUrl = Number(searchParams.get("page")) || 1;
+    setFilters(fromUrl);
+    setPage(pageFromUrl);
+  }, [searchParams]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const activeCategory = filters.category        || "";
   const activePurity   = filters["metal.purity"] || "";
-  const activeSort     = filters.sort           || "";
+  const activeSort     = filters.sort            || "";
 
-  // Reset to page 1 on any filter change (belt-and-suspenders guard)
   const safeUpdateFilter = (key, value) => {
     setPage(1);
     updateFilter(key, value);
@@ -155,7 +217,6 @@ export default function ProductListing() {
   const handleSort = (e) => safeUpdateFilter("sort", e.target.value);
 
   const handlePriceApply = (min, max) => {
-    // Apply both in one state update to avoid double fetch
     setPage(1);
     setFilters(prev => ({ ...prev, minPrice: min, maxPrice: max }));
   };
@@ -225,8 +286,12 @@ export default function ProductListing() {
               {PURITIES.map(p => <option key={p} value={p}>{p}</option>)}
             </select>
 
-            {/* Price — debounced + Enter */}
-            <PriceFilter onApply={handlePriceApply} />
+            {/* Price — debounced + Enter, synced with URL */}
+            <PriceFilter
+              initialMin={filters.minPrice || ""}
+              initialMax={filters.maxPrice || ""}
+              onApply={handlePriceApply}
+            />
 
             {/* Sort — controlled */}
             <div className="pl-sort">
@@ -292,7 +357,6 @@ export default function ProductListing() {
               {Array.from({ length: pages }, (_, i) => i + 1)
                 .filter(p => p === 1 || p === pages || Math.abs(p - page) <= 1)
                 .map((p, i, arr) => (
-                  // Fixed: Fragment with key to avoid React warning
                   <span key={p} style={{ display: "contents" }}>
                     {i > 0 && arr[i - 1] !== p - 1 && (
                       <span style={{ color: "#B0A090", fontSize: 13 }}>…</span>

@@ -95,7 +95,7 @@ export default function CheckoutPage() {
         shippingAddress: addr,
         payment: { method: payMethod },
       });
-      router.push(`/order-confirmation?order=${order.orderNumber}`);
+      router.push(`/order-confirmation/${order.orderNumber}`);
     } catch (e) {
       setError(e.message || "Failed to place order. Please try again.");
     } finally {

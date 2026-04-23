@@ -5,15 +5,20 @@ import { useAuth } from "@/context/AuthContext";
 
 /* ─────────────────────────────────────────
    useProducts — paginated product list
-   Usage: const { products, loading, total, page, setPage, setFilters } = useProducts()
+   Now accepts initialFilters from URL params (passed from page component)
+   Usage: const { products, loading, total, page, setPage, setFilters } = useProducts(initialFilters)
 ───────────────────────────────────────── */
 export function useProducts(initialFilters = {}) {
   const [products, setProducts] = useState([]);
   const [total,    setTotal]    = useState(0);
   const [pages,    setPages]    = useState(1);
-  const [page,     setPage]     = useState(1);
+  const [page,     setPage]     = useState(Number(initialFilters.page) || 1);
   const [loading,  setLoading]  = useState(true);
-  const [filters,  setFilters]  = useState(initialFilters);
+  const [filters,  setFilters]  = useState(() => {
+    // Strip 'page' from filters — page is managed separately
+    const { page: _p, ...rest } = initialFilters;
+    return rest;
+  });
 
   const load = useCallback(async () => {
     setLoading(true);

@@ -6,58 +6,75 @@ import Link from "next/link";
 import MobileSidebar from "./MobileSidebar";
 import SignupModal from "./SignupModel";
 import { useAuth } from "@/context/AuthContext";
+import { navApi } from "../../lib/api";
 
-/* ── Top-level nav items with routes ── */
-const menuItems = [
-  { name: "Brand",        href: "/about"                    },
-  { name: "Masterpieces", href: "/listing?sort=rating"      },
-  { name: "Jewellery",    href: "/listing", hasMegaMenu: true },
-  { name: "Weddings",     href: "/wedding"                  },
-  { name: "Occasions",    href: "/listing?occasion=Festive"  },
-  { name: "Gold Rate",    href: "/gold-rate"                 },
-  { name: "Store",        href: "/contact"                  },
-];
-
-/* ── Mega menu link maps ── */
-const CAT = {
-  "Earrings":      "/listing?category=Earring",
-  "Rings":         "/listing?category=Ring",
-  "Necklaces":     "/listing?category=Necklace",
-  "Bangles":       "/listing?category=Bangle",
-  "Mangalsutras":  "/listing?category=Mangalsutra",
-  "Pendants":      "/listing?category=Pendant",
-  "Bracelets":     "/listing?category=Bracelet",
-  "Chains":        "/listing?category=Chain",
-  "Coins":         "/listing?category=Other",
-  "All Jewellery": "/listing",
+/* ══════════════════════════════
+   STATIC FALLBACKS
+   (used while API loads or on error)
+══════════════════════════════ */
+const FALLBACK_NAV = {
+  topbar: {
+    visible: true,
+    text: "FREE SHIPPING ON ORDERS ABOVE ₹50,000 · BIS HALLMARKED JEWELLERY · VISIT OUR STORES",
+  },
+  navItems: [
+    { _id: "1", name: "Brand",        href: "/about",                   visible: true, hasMegaMenu: false },
+    { _id: "2", name: "Masterpieces", href: "/listing?sort=rating",     visible: true, hasMegaMenu: false },
+    { _id: "3", name: "Jewellery",    href: "/listing",                 visible: true, hasMegaMenu: true  },
+    { _id: "4", name: "Weddings",     href: "/wedding",                 visible: true, hasMegaMenu: false },
+    { _id: "5", name: "Occasions",    href: "/listing?occasion=Festive",visible: true, hasMegaMenu: false },
+    { _id: "6", name: "Gold Rate",    href: "/gold-rate",               visible: true, hasMegaMenu: false },
+    { _id: "7", name: "Store",        href: "/contact",                 visible: true, hasMegaMenu: false },
+  ],
+  megaCols: [
+    {
+      _id: "c1", title: "By Category", highlightLast: false,
+      items: [
+        { label: "Earrings",     href: "/listing?category=Earring",     visible: true },
+        { label: "Rings",        href: "/listing?category=Ring",        visible: true },
+        { label: "Necklaces",    href: "/listing?category=Necklace",    visible: true },
+        { label: "Bangles",      href: "/listing?category=Bangle",      visible: true },
+        { label: "Mangalsutras", href: "/listing?category=Mangalsutra", visible: true },
+      ],
+    },
+    {
+      _id: "c2", title: "", highlightLast: true,
+      items: [
+        { label: "Pendants",      href: "/listing?category=Pendant",  visible: true },
+        { label: "Bracelets",     href: "/listing?category=Bracelet", visible: true },
+        { label: "Chains",        href: "/listing?category=Chain",    visible: true },
+        { label: "Coins",         href: "/listing?category=Other",    visible: true },
+        { label: "All Jewellery", href: "/listing",                   visible: true },
+      ],
+    },
+    {
+      _id: "c3", title: "By Metal", highlightLast: false,
+      items: [
+        { label: "Gold Jewellery",    href: "/listing?metal=Gold",  visible: true },
+        { label: "Diamond Jewellery", href: "/listing?purity=18KT", visible: true },
+        { label: "Polki Jewellery",   href: "/listing?style=Polki", visible: true },
+      ],
+    },
+    {
+      _id: "c4", title: "By Karatage", highlightLast: false,
+      items: [
+        { label: "14KT", href: "/listing?purity=14KT", visible: true },
+        { label: "18KT", href: "/listing?purity=18KT", visible: true },
+        { label: "22KT", href: "/listing?purity=22KT", visible: true },
+        { label: "24KT", href: "/listing?purity=24KT", visible: true },
+      ],
+    },
+  ],
+  megaImgs: [
+    { _id: "i1", src: "https://www.tanishq.co.in/dw/image/v2/BKCK_PRD/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dw2562a9fe/homepage/shopByCategory/rings-cat.jpg",    alt: "Rings",    href: "/listing?category=Ring",   visible: true },
+    { _id: "i2", src: "https://www.tanishq.co.in/dw/image/v2/BKCK_PRD/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dw18de0cb1/homepage/shopByCategory/earrings-cat.jpg", alt: "Earrings", href: "/listing?category=Earring", visible: true },
+  ],
+  searchHints: ["Gold Rings", "Diamond Necklace", "Bangles", "Mangalsutra", "Earrings", "Bridal Sets"],
 };
-const METAL = {
-  "Gold Jewellery":    "/listing?metal=Gold",
-  "Diamond Jewellery": "/listing?purity=18KT",
-  "Polki Jewellery":   "/listing?style=Polki",
-};
-const KT = {
-  "14KT": "/listing?purity=14KT",
-  "18KT": "/listing?purity=18KT",
-  "22KT": "/listing?purity=22KT",
-  "24KT": "/listing?purity=24KT",
-};
 
-const megaCols = [
-  { title: "By Category",  items: ["Earrings","Rings","Necklaces","Bangles","Mangalsutras"], map: CAT },
-  { title: "",             items: ["Pendants","Bracelets","Chains","Coins","All Jewellery"], highlightLast: true, map: CAT },
-  { title: "By Metal",     items: ["Gold Jewellery","Diamond Jewellery","Polki Jewellery"], map: METAL },
-  { title: "By Karatage",  items: ["14KT","18KT","22KT","24KT"], map: KT },
-];
-
-const megaImgs = [
-  { src: "https://www.tanishq.co.in/dw/image/v2/BKCK_PRD/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dw2562a9fe/homepage/shopByCategory/rings-cat.jpg",    alt: "Rings",    href: "/listing?category=Ring"    },
-  { src: "https://www.tanishq.co.in/dw/image/v2/BKCK_PRD/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dw18de0cb1/homepage/shopByCategory/earrings-cat.jpg", alt: "Earrings", href: "/listing?category=Earring"  },
-];
-
-const HINTS = ["Gold Rings","Diamond Necklace","Bangles","Mangalsutra","Earrings","Bridal Sets"];
-
-/* ═══════════ STYLES ═══════════ */
+/* ══════════════════════════════
+   STYLES
+══════════════════════════════ */
 const S = `
   @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Jost:wght@300;400;500&display=swap');
 
@@ -73,12 +90,7 @@ const S = `
 
   /* Desktop nav */
   .nb-menu { display:flex; align-items:center; gap:0; }
-  .nb-link {
-    font-size:11px; font-weight:500; letter-spacing:1.5px; text-transform:uppercase;
-    color:#3D2B1A; padding:6px 11px; position:relative; transition:color .2s;
-    white-space:nowrap; text-decoration:none; display:inline-flex; align-items:center;
-    gap:4px; border:none; background:none; font-family:'Jost',sans-serif; cursor:pointer;
-  }
+  .nb-link { font-size:11px; font-weight:500; letter-spacing:1.5px; text-transform:uppercase; color:#3D2B1A; padding:6px 11px; position:relative; transition:color .2s; white-space:nowrap; text-decoration:none; display:inline-flex; align-items:center; gap:4px; border:none; background:none; font-family:'Jost',sans-serif; cursor:pointer; }
   .nb-link::after { content:''; position:absolute; bottom:0; left:11px; right:11px; height:1.5px; background:#B8862A; transform:scaleX(0); transform-origin:center; transition:transform .25s; }
   .nb-link:hover { color:#B8862A; }
   .nb-link:hover::after { transform:scaleX(1); }
@@ -89,20 +101,10 @@ const S = `
   .nb-mega-wrap { position:relative; }
   .nb-mega-wrap::after { content:''; position:absolute; top:100%; left:0; right:0; height:20px; }
 
-  /* Mega panel */
-  .nb-mega {
-    position:fixed; left:0; top:var(--navbar-bottom,110px); width:100vw;
-    background:#FFFDF9; border-top:2px solid #E8C96A;
-    box-shadow:0 20px 60px rgba(44,26,14,.14);
-    opacity:0; visibility:hidden; pointer-events:none;
-    transform:translateY(-8px);
-    transition:opacity .22s ease,transform .22s ease,visibility .22s;
-    z-index:49;
-  }
-  .nb-mega-wrap:hover .nb-mega, .nb-mega:hover {
-    opacity:1; visibility:visible; pointer-events:all; transform:translateY(0);
-  }
-  .nb-mega-inner { max-width:1400px; margin:0 auto; padding:32px 40px 36px; display:grid; grid-template-columns:repeat(4,1fr) 220px; gap:36px; }
+/* Mega panel */
+  .nb-mega { position:fixed; left:0; top:var(--navbar-bottom,110px); width:100vw; background:#FFFDF9; border-top:2px solid #E8C96A; box-shadow:0 20px 60px rgba(44,26,14,.14); opacity:0; visibility:hidden; pointer-events:none; transform:translateY(-8px); transition:opacity .22s ease,transform .22s ease,visibility .22s; z-index:49; }
+  .nb-mega-wrap:hover .nb-mega, .nb-mega:hover { opacity:1; visibility:visible; pointer-events:all; transform:translateY(0); }
+  .nb-mega-inner { max-width:1400px; margin:0 auto; padding:32px 40px 36px; display:grid; gap:36px; }
   .nb-col-title { font-size:9.5px; font-weight:600; letter-spacing:2.5px; color:#B8862A; text-transform:uppercase; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
   .nb-col-title::after { content:''; flex:1; height:1px; background:#EDE4D8; }
   .nb-mega ul { list-style:none; padding:0; margin:0; }
@@ -134,15 +136,8 @@ const S = `
   .nb-badge { position:absolute; top:-4px; right:-4px; background:#B8862A; color:#fff; font-size:9px; width:16px; height:16px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; }
   .nb-div { width:1px; height:18px; background:#D4C4B0; }
   .nb-mob-btn { display:none; background:none; border:none; cursor:pointer; color:#3D2B1A; }
-
   @media(max-width:1100px){ .nb-link{padding:6px 8px;font-size:10.5px;} }
-  @media(max-width:768px){
-    .nb-inner{padding:0 20px;}
-    .nb-menu,.nb-icons{display:none;}
-    .nb-mob-btn{display:flex;}
-    .nb-search-drop,.nb-search-hints{padding:16px 20px;}
-    .nb-search-input{font-size:22px;}
-  }
+  @media(max-width:768px){ .nb-inner{padding:0 20px;} .nb-menu,.nb-icons{display:none;} .nb-mob-btn{display:flex;} .nb-search-drop,.nb-search-hints{padding:16px 20px;} .nb-search-input{font-size:22px;} }
 `;
 
 /* ═══════════ COMPONENT ═══════════ */
@@ -152,35 +147,43 @@ export default function Navbar() {
   const [scrolled,   setScrolled]   = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [query,      setQuery]      = useState("");
+  const [navData,    setNavData]    = useState(FALLBACK_NAV);
   const searchInputRef = useRef(null);
   const router   = useRouter();
   const pathname = usePathname();
-  const { cartCount } = useAuth();
+  const { cartCount, isLoggedIn } = useAuth();
 
-  /* Update CSS var --navbar-bottom */
+  /* ── Fetch nav config from backend ── */
+  useEffect(() => {
+    navApi.get()
+      .then(({ nav }) => {
+        if (nav) setNavData(nav);
+      })
+      .catch(() => { /* keep fallback silently */ });
+  }, []);
+
+  /* ── Update --navbar-bottom CSS var ── */
   const updateVar = () => {
     const el = document.querySelector(".nb-root");
     if (el) document.documentElement.style.setProperty("--navbar-bottom", `${el.getBoundingClientRect().bottom}px`);
   };
-
   useEffect(() => {
     updateVar();
     window.addEventListener("resize", updateVar);
     return () => window.removeEventListener("resize", updateVar);
   }, []);
-
   useEffect(() => {
     const h = () => { setScrolled(window.scrollY > 20); updateVar(); };
     window.addEventListener("scroll", h, { passive: true });
     return () => window.removeEventListener("scroll", h);
   }, []);
 
-  /* Focus input when search opens */
+  /* ── Focus search on open ── */
   useEffect(() => {
     if (showSearch) setTimeout(() => searchInputRef.current?.focus(), 60);
   }, [showSearch]);
 
-  /* Escape closes search */
+  /* ── Escape closes search ── */
   useEffect(() => {
     const h = (e) => { if (e.key === "Escape") setShowSearch(false); };
     window.addEventListener("keydown", h);
@@ -196,12 +199,6 @@ export default function Navbar() {
     router.push(`/search?q=${encodeURIComponent(q)}`);
   };
 
-  const goHint = (hint) => {
-    setShowSearch(false);
-    router.push(`/search?q=${encodeURIComponent(hint)}`);
-  };
-
-  /* Active check: matches pathname (ignores query) */
   const isActive = (href) => {
     if (!href) return false;
     const base = href.split("?")[0];
@@ -209,44 +206,59 @@ export default function Navbar() {
     return pathname === base || pathname.startsWith(base + "/");
   };
 
+  /* ── Destructure live data ── */
+  const { topbar, navItems = [], megaCols = [], megaImgs = [], searchHints = [] } = navData;
+
+  /* Build grid columns count: megaCols + 1 image col */
+  const gridCols = `repeat(${megaCols.length}, 1fr) 220px`;
+
   return (
     <>
       <style>{S}</style>
 
       <div className={`nb-root${scrolled ? " nb-scrolled" : ""}`}>
-        {/* Announcement topbar */}
-        <div className="nb-topbar">
-          FREE SHIPPING ON ORDERS ABOVE ₹50,000 &nbsp;·&nbsp; BIS HALLMARKED JEWELLERY &nbsp;·&nbsp; VISIT OUR STORES
-        </div>
+        {/* Topbar — controlled by backend */}
+        {topbar?.visible && <div className="nb-topbar">{topbar.text}</div>}
         <div className="nb-gold-line" />
 
         <div className="nb-inner">
           {/* Logo */}
-          <Link href="/" className="nb-logo">MAN<span>A</span>S</Link>
+          <Link href="/" className="nb-logo">
+            MAN<span>A</span>S
+          </Link>
 
-          {/* Desktop nav */}
+          {/* Desktop nav — from backend */}
           <nav className="nb-menu">
-            {menuItems.map((item, i) =>
+            {navItems.map((item) =>
               item.hasMegaMenu ? (
-                <div key={i} className="nb-mega-wrap">
-                  <Link href={item.href} className={`nb-link${isActive(item.href) ? " active" : ""}`}>
-                    {item.name} <span style={{ fontSize: 9, opacity: .7 }}>▾</span>
+                <div key={item._id} className="nb-mega-wrap">
+                  <Link
+                    href={item.href || "/listing"}
+                    className={`nb-link${isActive(item.href) ? " active" : ""}`}
+                  >
+                    {item.name}{" "}
+                    <span style={{ fontSize: 9, opacity: 0.7 }}>▾</span>
                   </Link>
 
-                  {/* Mega panel */}
+                  {/* Mega panel — columns from backend */}
                   <div className="nb-mega">
-                    <div className="nb-mega-inner">
-                      {megaCols.map((col, j) => (
-                        <div key={j}>
-                          {col.title && <p className="nb-col-title">{col.title}</p>}
+                    <div
+                      className="nb-mega-inner"
+                      style={{ gridTemplateColumns: gridCols }}
+                    >
+                      {megaCols.map((col) => (
+                        <div key={col._id}>
+                          {col.title && (
+                            <p className="nb-col-title">{col.title}</p>
+                          )}
                           <ul>
                             {col.items.map((itm, k) => (
                               <li key={k}>
                                 <Link
-                                  href={col.map?.[itm] || "/listing"}
+                                  href={itm.href || "/listing"}
                                   className={`nb-mega-item${col.highlightLast && k === col.items.length - 1 ? " highlight" : ""}`}
                                 >
-                                  {itm}
+                                  {itm.label}
                                 </Link>
                               </li>
                             ))}
@@ -254,10 +266,14 @@ export default function Navbar() {
                         </div>
                       ))}
 
-                      {/* Featured images */}
+                      {/* Featured images — from backend */}
                       <div className="nb-mega-imgs">
-                        {megaImgs.map((img, k) => (
-                          <Link key={k} href={img.href} className="nb-mega-img-wrap">
+                        {megaImgs.map((img) => (
+                          <Link
+                            key={img._id}
+                            href={img.href || "/listing"}
+                            className="nb-mega-img-wrap"
+                          >
                             <img src={img.src} alt={img.alt} />
                             <span className="nb-mega-img-label">{img.alt}</span>
                           </Link>
@@ -268,23 +284,37 @@ export default function Navbar() {
                 </div>
               ) : (
                 <Link
-                  key={i}
+                  key={item._id}
                   href={item.href || "/"}
                   className={`nb-link${isActive(item.href) ? " active" : ""}`}
                 >
                   {item.name}
                 </Link>
-              )
+              ),
             )}
           </nav>
 
           {/* Desktop icons */}
           <div className="nb-icons">
-            <button className="nb-icon" onClick={() => setShowSearch(v => !v)} title="Search">
+            <button
+              className="nb-icon"
+              onClick={() => setShowSearch((v) => !v)}
+              title="Search"
+            >
               {showSearch ? <X size={17} /> : <Search size={17} />}
             </button>
             <div className="nb-div" />
-            <button className="nb-icon" onClick={() => setOpenModel(true)} title="My Account">
+            <button
+              className="nb-icon"
+              onClick={() => {
+                if (isLoggedIn) {
+                  router.push("/account");
+                } else {
+                  setOpenModel(true);
+                }
+              }}
+              title="My Account"
+            >
               <User size={17} />
             </button>
             <Link href="/wishlist" className="nb-icon" title="Wishlist">
@@ -303,7 +333,7 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Inline search overlay */}
+      {/* Search overlay — hints from backend */}
       {showSearch && (
         <div className="nb-search-drop">
           <form className="nb-search-form" onSubmit={handleSearch}>
@@ -313,21 +343,34 @@ export default function Navbar() {
               className="nb-search-input"
               placeholder="Search jewellery…"
               value={query}
-              onChange={e => setQuery(e.target.value)}
+              onChange={(e) => setQuery(e.target.value)}
             />
-            <button type="button" className="nb-search-close" onClick={() => setShowSearch(false)}>
+            <button
+              type="button"
+              className="nb-search-close"
+              onClick={() => setShowSearch(false)}
+            >
               <X size={20} />
             </button>
           </form>
           <div className="nb-search-hints">
-            {HINTS.map(h => (
-              <button key={h} className="nb-hint" onClick={() => goHint(h)}>{h}</button>
+            {searchHints.map((h, i) => (
+              <button
+                key={i}
+                className="nb-hint"
+                onClick={() => {
+                  setShowSearch(false);
+                  router.push(`/search?q=${encodeURIComponent(h)}`);
+                }}
+              >
+                {h}
+              </button>
             ))}
           </div>
         </div>
       )}
 
-      <MobileSidebar isOpen={isOpen} setIsOpen={setIsOpen} />
+      <MobileSidebar isOpen={isOpen} setIsOpen={setIsOpen} navData={navData} />
       {openModel && <SignupModal onClose={() => setOpenModel(false)} />}
     </>
   );

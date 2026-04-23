@@ -35,11 +35,11 @@ const S = `
 .ac-user-phone{font-size:11px;color:#7A6352;letter-spacing:.5px;position:relative;z-index:1;}
 .ac-gold-strip{height:2px;background:linear-gradient(90deg,transparent,#B8862A 30%,#E8C96A 50%,#B8862A 70%,transparent);}
 .ac-nav{padding:6px 0;}
-.ac-nav-item{display:flex;align-items:center;gap:11px;padding:12px 20px;font-size:12.5px;color:#5A4535;cursor:pointer;border-bottom:1px solid #F5EDE3;transition:all .15s;text-decoration:none;letter-spacing:.3px;}
+.ac-nav-item{display:flex;align-items:center;gap:11px;padding:12px 20px;font-size:12.5px;color:#5A4535;cursor:pointer;border:none;border-bottom:1px solid #F5EDE3;transition:all .15s;text-decoration:none;letter-spacing:.3px;width:100%;background:none;outline:none;}
 .ac-nav-item:last-of-type{border-bottom:none;}
 .ac-nav-item:hover{background:#FBF6EE;color:#B8862A;}
 .ac-nav-item.active{background:#FBF6EE;color:#B8862A;font-weight:500;}
-.ac-nav-item.danger{color:#993C1D;border-top:1px solid #F5EDE3;}
+.ac-nav-item.danger{color:#993C1D}
 .ac-nav-item.danger:hover{background:#FAECE7;border-color:#F5EDE3;}
 .ac-nav-badge{margin-left:auto;background:#2C1A0E;color:#D4AF6A;font-size:9px;padding:2px 7px;border-radius:10px;font-weight:600;}
 

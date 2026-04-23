@@ -106,11 +106,15 @@ const S = `
   .msb-footer { padding:12px 20px; border-top:1px solid #E8DDD0; font-size:11px; color:#9E8875; display:flex; align-items:center; gap:6px; flex-shrink:0; }
 `;
 
-export default function MobileSidebar({ isOpen, setIsOpen }) {
+export default function MobileSidebar({ isOpen, setIsOpen, navData = null }) {
   const [openIndex, setOpenIndex] = useState(null);
   const [query,     setQuery]     = useState("");
   const router = useRouter();
   const { cartCount } = useAuth();
+
+  /* Use API data if provided, else fallback to static */
+  const dynamicNavItems = navData?.navItems || menuItems;
+  const dynamicMegaCols = navData?.megaCols || megaCols;
 
   const close = () => setIsOpen(false);
 
@@ -152,7 +156,7 @@ export default function MobileSidebar({ isOpen, setIsOpen }) {
 
         {/* Nav items */}
         <nav className="msb-nav">
-          {menuItems.map((item, idx) => (
+          {dynamicNavItems.map((item, idx) => (
             <div key={idx}>
               {item.hasMegaMenu ? (
                 /* Accordion toggle for Jewellery */
@@ -177,23 +181,28 @@ export default function MobileSidebar({ isOpen, setIsOpen }) {
                 </Link>
               )}
 
-              {/* Mega accordion content */}
+              {/* Mega accordion content — supports both API {label,href} and legacy string items */}
               {item.hasMegaMenu && (
                 <div className={`msb-dropdown${openIndex === idx ? " open" : ""}`}>
                   <div className="msb-dropdown-inner">
-                    {megaCols.map((col, ci) => (
-                      <div key={ci}>
+                    {dynamicMegaCols.map((col, ci) => (
+                      <div key={col._id || ci}>
                         {col.title && <p className="msb-col-title">{col.title}</p>}
-                        {col.items.map((sub, si) => (
-                          <Link
-                            key={si}
-                            href={col.map?.[sub] || "/listing"}
-                            className={`msb-sub-item${ci === 0 && si === col.items.length - 1 ? " highlight" : ""}`}
-                            onClick={close}
-                          >
-                            {sub}
-                          </Link>
-                        ))}
+                        {col.items.map((sub, si) => {
+                          const isLastHighlight = col.highlightLast && si === col.items.length - 1;
+                          const label = typeof sub === "string" ? sub : sub.label;
+                          const href  = typeof sub === "string" ? (col.map?.[sub] || "/listing") : (sub.href || "/listing");
+                          return (
+                            <Link
+                              key={si}
+                              href={href}
+                              className={`msb-sub-item${isLastHighlight ? " highlight" : ""}`}
+                              onClick={close}
+                            >
+                              {label}
+                            </Link>
+                          );
+                        })}
                       </div>
                     ))}
                   </div>

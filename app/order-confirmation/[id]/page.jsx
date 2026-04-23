@@ -1,5 +1,9 @@
+"use client";
 import Link from "next/link";
 import { CheckCircle, Package, Truck, MapPin } from "lucide-react";
+import { authApi, orderApi, wishlistApi } from "../../../lib/api";
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 
 const styles = `
   @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Jost:wght@300;400;500&display=swap');
@@ -64,8 +68,20 @@ const styles = `
 `;
 
 const orderItems = [
-  { id: 1, name: "Aakarshan Gold Necklace", meta: "22KT · 74.09g", price: 112732, img: "https://picsum.photos/120/120?random=11" },
-  { id: 2, name: "Diamond Finger Ring", meta: "18KT VVS1 · 5.63g", price: 52697, img: "https://picsum.photos/120/120?random=22" },
+  {
+    id: 1,
+    name: "Aakarshan Gold Necklace",
+    meta: "22KT · 74.09g",
+    price: 112732,
+    img: "https://picsum.photos/120/120?random=11",
+  },
+  {
+    id: 2,
+    name: "Diamond Finger Ring",
+    meta: "18KT VVS1 · 5.63g",
+    price: 52697,
+    img: "https://picsum.photos/120/120?random=22",
+  },
 ];
 
 const trackSteps = [
@@ -76,9 +92,24 @@ const trackSteps = [
 ];
 
 export default function OrderConfirmationPage() {
+  const [order, setOrder] = useState(null);
+  const [ordersLoading, setOL] = useState(false);
   const subtotal = orderItems.reduce((s, it) => s + it.price, 0);
   const gst = Math.round(subtotal * 0.03);
   const total = subtotal + gst;
+  const params = useParams();
+  const orderId = params?.id;
+
+  useEffect(() => {
+    if (!orderId) return;
+    setOL(true);
+    orderApi
+      .getOne(orderId)
+      .then((r) => setOrder(r.order || []))
+      .catch(() => {})
+      .finally(() => setOL(false));
+  }, [orderId]);
+
 
   return (
     <>
@@ -94,10 +125,18 @@ export default function OrderConfirmationPage() {
                 </div>
               </div>
               <span className="oc-banner-tag">Order Placed Successfully</span>
-              <h1 className="oc-banner-title">Thank You, <em>Aarav!</em></h1>
+              <h1 className="oc-banner-title">
+                Thank You, <em>{order?.shippingAddress?.fullName}!</em>
+              </h1>
               <div className="oc-gold-line" />
-              <p className="oc-banner-sub">Your exquisite jewellery is being carefully prepared.<br />You will receive a confirmation on your registered email.</p>
-              <p className="oc-order-num" style={{ marginTop: "16px" }}>Order ID: <strong>MANAS-2025-00847</strong></p>
+              <p className="oc-banner-sub">
+                Your exquisite jewellery is being carefully prepared.
+                <br />
+                You will receive a confirmation on your registered email.
+              </p>
+              <p className="oc-order-num" style={{ marginTop: "16px" }}>
+                Order ID: <strong>{order?.orderNumber}</strong>
+              </p>
             </div>
           </div>
 
@@ -110,37 +149,79 @@ export default function OrderConfirmationPage() {
                 return (
                   <>
                     <div key={i} className="oc-track-step">
-                      <div className={`oc-track-icon ${step.status}`}><Icon size={18} /></div>
-                      <span className={`oc-track-label ${step.status}`}>{step.label}</span>
+                      <div className={`oc-track-icon ${step.status}`}>
+                        <Icon size={18} />
+                      </div>
+                      <span className={`oc-track-label ${step.status}`}>
+                        {step.label}
+                      </span>
                     </div>
-                    {i < trackSteps.length - 1 && <div className={`oc-track-line${step.status === "done" ? " done" : ""}`} />}
+                    {i < trackSteps.length - 1 && (
+                      <div
+                        className={`oc-track-line${step.status === "done" ? " done" : ""}`}
+                      />
+                    )}
                   </>
                 );
               })}
             </div>
-            <p style={{ fontSize: "12px", color: "#9E8875", marginTop: "16px", textAlign: "center" }}>
-              Estimated Delivery: <strong style={{ color: "#2C1A0E" }}>5 – 7 Business Days</strong>
+            <p
+              style={{
+                fontSize: "12px",
+                color: "#9E8875",
+                marginTop: "16px",
+                textAlign: "center",
+              }}
+            >
+              Estimated Delivery:{" "}
+              <strong style={{ color: "#2C1A0E" }}>5 – 7 Business Days</strong>
             </p>
           </div>
 
           {/* Items */}
           <div className="oc-card">
             <h2 className="oc-card-title">Items Ordered</h2>
-            {orderItems.map(it => (
-              <div key={it.id} className="oc-item">
-                <img src={it.img} alt={it.name} className="oc-item-img" />
-                <div>
-                  <p className="oc-item-name">{it.name}</p>
-                  <p className="oc-item-meta">{it.meta}</p>
+            {order?.items && order.items.length > 0 ? (
+              order.items.map((it) => (
+                <div key={it._id} className="oc-item">
+                  <img src={it.image} className="oc-item-img" />
+                  <div>
+                    <p className="oc-item-name">{it.name}</p>
+                    <p className="oc-item-meta">
+                      Qty: {it.qty} {it.size ? `· Size: ${it.size}` : ""}
+                    </p>
+                  </div>
+                  <span className="oc-item-price">
+                    ₹ {it.price.toLocaleString("en-IN")}
+                  </span>
                 </div>
-                <span className="oc-item-price">₹ {it.price.toLocaleString("en-IN")}</span>
+              ))
+            ) : (
+              <p>No items found.</p>
+            )}
+            <div
+              style={{
+                marginTop: "16px",
+                paddingTop: "16px",
+                borderTop: "1px solid #F0E8DC",
+              }}
+            >
+              <div className="oc-sum-row">
+                <span>Subtotal</span>
+                <span>₹ {order?.pricing?.subtotal || 0}</span>
               </div>
-            ))}
-            <div style={{ marginTop: "16px", paddingTop: "16px", borderTop: "1px solid #F0E8DC" }}>
-              <div className="oc-sum-row"><span>Subtotal</span><span>₹ {subtotal.toLocaleString("en-IN")}</span></div>
-              <div className="oc-sum-row"><span>GST (3%)</span><span>₹ {gst.toLocaleString("en-IN")}</span></div>
-              <div className="oc-sum-row"><span>Shipping</span><span style={{ color: "#2e7d32" }}>Free</span></div>
-              <div className="oc-sum-row total"><span>Total Paid</span><span>₹ {total.toLocaleString("en-IN")}</span></div>
+              <div className="oc-sum-row">
+                <span>GST (3%)</span>
+                <span>₹ {order?.pricing?.gst || 0}</span>
+              </div>
+              <div className="oc-sum-row">
+                <span>Shipping</span>
+                <span style={{ color: "#2e7d32" }}>Free</span>
+              </div>
+              <div className="oc-sum-row total">
+                <span>Total Paid</span>
+                <span>₹ {order?.pricing?.total || 0}</span>
+              </div>
             </div>
           </div>
 
@@ -148,17 +229,24 @@ export default function OrderConfirmationPage() {
           <div className="oc-card">
             <h2 className="oc-card-title">Delivery Address</h2>
             <p className="oc-address">
-              <strong>Aarav Sharma</strong>
-              42, Sunrise Apartments, MG Road<br />
-              Indore, Madhya Pradesh – 452001<br />
-              📞 +91 98765 43210
+              <strong>{order?.shippingAddress?.fullName}</strong>
+              {order?.shippingAddress?.line1}
+              <br />
+              {order?.shippingAddress?.city}, {order?.shippingAddress?.state} –{" "}
+              {order?.shippingAddress?.pincode}
+              <br />
+              📞 {order?.shippingAddress?.phone}
             </p>
           </div>
 
           {/* Actions */}
           <div className="oc-actions">
-            <Link href="/listing" className="oc-btn-primary">Continue Shopping</Link>
-            <Link href="/" className="oc-btn-outline">Back to Home</Link>
+            <Link href="/listing" className="oc-btn-primary">
+              Continue Shopping
+            </Link>
+            <Link href="/" className="oc-btn-outline">
+              Back to Home
+            </Link>
           </div>
         </div>
       </div>
