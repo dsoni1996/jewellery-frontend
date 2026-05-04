@@ -6,7 +6,7 @@ import HeroCarousel       from "../components/home/HeroCarousel";
 import Collection         from "../components/home/Collection";
 import Categories         from "../components/home/Categories";
 import TrendingJewellerys from "../components/home/TrendingJewellerys";
-import TanishqWorld       from "../components/home/TanishqWorld";
+import ManasWorld       from "../components/home/TanishqWorld";
 import NewArrival         from "../components/home/NewArrival";
 import NewsletterBanner   from "../components/home/NewsletterBanner";
 
@@ -17,7 +17,7 @@ const SECTION_MAP = {
   categories:     Categories,
   trending:       TrendingJewellerys,
   new_arrivals:   NewArrival,
-  trust_world:    TanishqWorld,
+  trust_world:    ManasWorld,
   newsletter:     NewsletterBanner,
 };
 

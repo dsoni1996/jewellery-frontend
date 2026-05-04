@@ -45,7 +45,7 @@ import { ChevronDown, ShoppingBag } from "lucide-react";
 //   { name: "GST @ 3%", sub: "", rate: "—", weight: "—", discount: "—", value: "₹ 1,534" },
 // ];
 
-const grandTotal = "₹ 52,697";
+
 
 const styles = `
   @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Jost:wght@300;400;500&display=swap');
@@ -356,6 +356,9 @@ const priceBreakupData = [
   },
 ];
 
+const gst = Math.round(product?.price?.current * 0.03);
+const grandTotal = (product?.price?.current || 0) + (product?.makingCharges || 0) + gst
+
   return (
     <>
       <style>{styles}</style>
@@ -439,7 +442,9 @@ const priceBreakupData = [
               </table>
               <div className="pd-price-total">
                 <span className="pd-price-total-label">Grand Total (incl. GST)</span>
-                <span className="pd-price-total-value">{grandTotal}</span>
+                <span className="pd-price-total-value">
+  ₹ {grandTotal.toLocaleString("en-IN")}
+</span>
               </div>
             </div>
           )}
@@ -447,23 +452,25 @@ const priceBreakupData = [
         </div>
       </div>
 
-      {/* ── Sticky bottom bar ── */}
-      <div className="pd-sticky">
-        <div className="pd-sticky-info">
-          <span className="pd-sticky-price">₹ 52,697</span>
-          <div className="pd-sticky-meta">
-            <span>Size: <strong>16.40 mm</strong></span>
-            <span>Weight: <strong>5.634 g</strong></span>
-          </div>
-          <div className="pd-sticky-meta">
-            <span>Metal: <strong>18KT Yellow Gold</strong></span>
-            <span>Stone: <strong>Diamond VVS1</strong></span>
-          </div>
-        </div>
-        <button className="pd-sticky-btn">
-          <ShoppingBag size={14} /> Add to Cart
-        </button>
-      </div>
+     {/* ── Sticky bottom bar ── */}
+<div className="pd-sticky">
+  <div className="pd-sticky-info">
+    <span className="pd-sticky-price">
+      ₹ {product?.price?.current?.toLocaleString("en-IN")}
+    </span>
+    <div className="pd-sticky-meta">
+      <span>Size: <strong>{product?.variants?.sizes?.[0] || "—"}</strong></span>
+      <span>Weight: <strong>{product?.metal?.weight} g</strong></span>
+    </div>
+    <div className="pd-sticky-meta">
+      <span>Metal: <strong>{product?.metal?.purity} {product?.metal?.colour} {product?.metal?.type}</strong></span>
+      <span>Stone: <strong>{product?.stones?.type || "No Stone"}</strong></span>
+    </div>
+  </div>
+  <button className="pd-sticky-btn">
+    <ShoppingBag size={14} /> Add to Cart
+  </button>
+</div>
     </>
   );
 };

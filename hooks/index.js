@@ -184,3 +184,17 @@ export function useHomeSections() {
 
   return { ...sections, loading };
 }
+
+
+
+export function useToast(duration = 3200) {
+  const [toasts, setToasts] = useState([]);
+
+  const showToast = useCallback((msg, type = "success") => {
+    const id = Date.now();
+    setToasts(p => [...p, { id, msg, type }]);
+    setTimeout(() => setToasts(p => p.filter(t => t.id !== id)), duration);
+  }, [duration]);
+
+  return { toasts, showToast };
+}

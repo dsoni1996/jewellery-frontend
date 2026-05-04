@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Heart, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 import api from "../../lib/api";
+import { useCart } from "../../hooks";
 
 const cardStyles = `
   @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Jost:wght@300;400;500&display=swap');
@@ -11,7 +12,47 @@ const cardStyles = `
   .pc-img-wrap { position: relative; overflow: hidden; background: #F5EDE3; aspect-ratio: 1; }
   .pc-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; display: block; }
   .pc-card:hover .pc-img { transform: scale(1.06); }
-  .pc-badge { position: absolute; top: 12px; left: 12px; background: #2C1A0E; color: #D4AF6A; font-size: 9px; font-weight: 500; letter-spacing: 1.5px; padding: 4px 9px; text-transform: uppercase; border-radius: 2px; }
+  .pc-badge-wrap { position: absolute; top: 12px; left: 12px; display: flex; gap: 6px; }
+
+.pc-badge {
+  background: #2C1A0E;
+  color: #D4AF6A;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  padding: 4px 9px;
+  text-transform: uppercase;
+  border-radius: 2px;
+}
+  .pc-badge.more {
+  background: #2C1A0E;;
+}
+
+
+.pc-badge-wrap .pc-tooltip {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  background: rgba(44,26,14,0.92);
+  color: #D4AF6A;
+  font-size: 10px;
+  letter-spacing: 1px;
+  padding: 6px 10px;
+  white-space: nowrap;
+  border-radius: 2px;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 0.2s, transform 0.2s;
+  z-index: 10;
+}
+.pc-badge-wrap:hover .pc-tooltip {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+
+
   .pc-wish { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.9); border: none; border-radius: 50%; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; backdrop-filter: blur(4px); }
   .pc-wish:hover { background: #fff; transform: scale(1.08); }
   .pc-wish.active { color: #c0392b; }
@@ -26,9 +67,10 @@ const cardStyles = `
   .pc-gold-dot { width: 8px; height: 8px; border-radius: 50%; background: linear-gradient(135deg, #D4AF6A, #B8862A); display: inline-block; }
 `;
 
-const ProductCard = ({ product }) => {
+const ProductCard = ({ product, showToast  }) => {
   const { title, price, imgUrl, id , occasion} = product;
   const [wishlisted, setWishlisted] = useState(false);
+   const { addItem } = useCart();
 
 
     const handleAddToCart = async (e) => {
@@ -37,18 +79,18 @@ const ProductCard = ({ product }) => {
 
       const token = localStorage.getItem("manas_token");
 
-      console.log('Adding to cart, token:', token)
       if (!token) {
         alert("Login required");
         return;
       }
 
       try {
-        await api.cart.add(id, 1);
-        alert("Added to cart ✅");
+        // await api.cart.add(id, 1);
+        await addItem(id, 1);
+        showToast?.("Added to cart");
       } catch (err) {
         console.error(err);
-        alert("Failed to add to cart");
+        showToast?.("Failed to add to cart", "error");
       } finally {
       }
     };
@@ -65,6 +107,7 @@ const ProductCard = ({ product }) => {
 
       try {
         await api.wishlist.toggle(id, token);
+        showToast?.(wishlisted ? "Removed from wishlist" : "Added to wishlist");
         setWishlisted((prev) => !prev);
       } catch (err) {
         console.error(err);
@@ -72,7 +115,6 @@ const ProductCard = ({ product }) => {
       }
     };
 
-    console.log('product',product)
 
   return (
     <>
@@ -84,9 +126,15 @@ const ProductCard = ({ product }) => {
             className="pc-img"
             alt={title}
           />
-          {occasion.map((accation, index) => (
-            <span className="pc-badge" key={index}>{accation}</span>
-          ))}
+          <div className="pc-badge-wrap">
+            <span className="pc-badge">{occasion[0]}</span>
+            {occasion.length > 1 && (
+              <span className="pc-badge more">+{occasion.length - 1}</span>
+            )}
+            {occasion.length > 1 && (
+              <span className="pc-tooltip">{occasion.join(" · ")}</span>
+            )}
+          </div>
           <button
             className={`pc-wish${wishlisted ? " active" : ""}`}
             onClick={(e) => handleWishlist(e)}

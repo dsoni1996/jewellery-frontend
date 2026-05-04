@@ -1,82 +1,78 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
-import { Heart, ShoppingBag, ArrowRight, Loader2, CheckCircle, AlertCircle } from "lucide-react";
+import { Heart, ShoppingBag, ArrowRight, Loader2, CheckCircle, AlertCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { useCart }  from "../../hooks";
+import { useCart } from "../../hooks";
 import { productApi } from "../../lib/api";
 
-/* ──────────────────────────────────────────
+/* ════════════════════════════════════════
    STATIC DATA
-────────────────────────────────────────── */
+════════════════════════════════════════ */
 const occasions = [
   { id: "all",        label: "All Collections" },
-  { id: "engagement", label: "Engagement"      },
-  { id: "mehendi",    label: "Mehendi"          },
-  { id: "sangeet",    label: "Sangeet"          },
-  { id: "wedding",    label: "Wedding Day"      },
-  { id: "reception",  label: "Reception"        },
-  { id: "honeymoon",  label: "Honeymoon"        },
+  { id: "engagement", label: "Engagement"       },
+  { id: "mehendi",    label: "Mehendi"           },
+  { id: "sangeet",    label: "Sangeet"           },
+  { id: "wedding",    label: "Wedding Day"       },
+  { id: "reception",  label: "Reception"         },
+  { id: "honeymoon",  label: "Honeymoon"         },
 ];
 
-/* Fallback static sets when API has no bridal products */
 const STATIC_SETS = [
-  { id:"s1", name:"Rani Haar Bridal Set",        sub:"The Grand Entrance",      occasion:["wedding"],              tag:"22KT Gold",     metal:"22 KT Yellow Gold",         weight:"98.4 g",  pieces:5, piecesList:"Necklace · Earrings · Maang Tikka · Nose Ring · Bangles", price:524000, originalPrice:578000, rating:4.9, reviews:312, badge:"Bestseller", img:"https://picsum.photos/600/700?random=201", imgs:["https://picsum.photos/600/700?random=201","https://picsum.photos/600/700?random=202","https://picsum.photos/600/700?random=203"], description:"A statement bridal set crafted in 22KT gold, adorned with hand-set polki diamonds and meenakari enamel work. Made for the bride who commands every room." },
-  { id:"s2", name:"Solitaire Engagement Ring",   sub:"The Promise",             occasion:["engagement"],           tag:"18KT Diamond",  metal:"18 KT White Gold",          weight:"4.2 g",   pieces:1, piecesList:"Ring",                                                     price:185000, originalPrice:185000, rating:4.8, reviews:246, badge:"New",       img:"https://picsum.photos/600/700?random=204", imgs:["https://picsum.photos/600/700?random=204","https://picsum.photos/600/700?random=205"], description:"A 1.2 ct VVS2 round brilliant diamond set in an 18KT white gold cathedral mount. Certified by IGI. The ring she has always imagined." },
-  { id:"s3", name:"Floral Meenakari Choker",     sub:"The Mehendi Morning",     occasion:["mehendi","sangeet"],    tag:"22KT Gold",     metal:"22 KT Yellow Gold",         weight:"42.6 g",  pieces:3, piecesList:"Choker · Earrings · Maang Tikka",                         price:236000, originalPrice:258000, rating:4.7, reviews:189, badge:"Limited",   img:"https://picsum.photos/600/700?random=206", imgs:["https://picsum.photos/600/700?random=206","https://picsum.photos/600/700?random=207"], description:"Vivid meenakari enamel flowers in turquoise and coral set in a 22KT gold choker. Perfect for the colourful celebrations before the big day." },
-  { id:"s4", name:"Diamond Mangalsutra",         sub:"The Sacred Bond",         occasion:["wedding"],              tag:"18KT Diamond",  metal:"18 KT Yellow & Black Gold", weight:"9.8 g",   pieces:1, piecesList:"Mangalsutra",                                             price:98500,  originalPrice:112000, rating:4.9, reviews:421, badge:"Bestseller", img:"https://picsum.photos/600/700?random=208", imgs:["https://picsum.photos/600/700?random=208","https://picsum.photos/600/700?random=209"], description:"Contemporary mangalsutra with VS clarity diamonds set between traditional black bead strands. A timeless symbol reimagined for the modern bride." },
-  { id:"s5", name:"Kundan Polki Necklace Set",   sub:"The Royal Sangeet",       occasion:["sangeet","reception"],  tag:"22KT Gold",     metal:"22 KT Yellow Gold",         weight:"68.2 g",  pieces:4, piecesList:"Necklace · Earrings · Maang Tikka · Ring",               price:368000, originalPrice:395000, rating:4.8, reviews:178, badge:null,         img:"https://picsum.photos/600/700?random=210", imgs:["https://picsum.photos/600/700?random=210","https://picsum.photos/600/700?random=211"], description:"Uncut polki diamonds set in the classic Kundan technique. Each stone hand-placed by our artisans over 120 hours of careful craftsmanship." },
-  { id:"s6", name:"Pearl & Diamond Reception Set",sub:"The Grand Finale",       occasion:["reception"],            tag:"18KT Diamond",  metal:"18 KT White Gold",          weight:"22.4 g",  pieces:3, piecesList:"Necklace · Earrings · Bracelet",                          price:295000, originalPrice:295000, rating:4.6, reviews:134, badge:"Exclusive",  img:"https://picsum.photos/600/700?random=212", imgs:["https://picsum.photos/600/700?random=212","https://picsum.photos/600/700?random=213"], description:"South Sea pearls paired with diamond pavé in 18KT white gold. Understated luxury for the reception evening." },
-  { id:"s7", name:"Gold Kada Bangle Set",        sub:"The Everyday Bride",      occasion:["mehendi","honeymoon"],  tag:"22KT Gold",     metal:"22 KT Yellow Gold",         weight:"56.0 g",  pieces:6, piecesList:"6 Bangles",                                               price:312000, originalPrice:340000, rating:4.7, reviews:267, badge:null,         img:"https://picsum.photos/600/700?random=214", imgs:["https://picsum.photos/600/700?random=214","https://picsum.photos/600/700?random=215"], description:"A set of six hand-engraved gold kadas with delicate floral motifs. Stack them together or wear one — beautiful either way." },
-  { id:"s8", name:"Emerald Gold Haath Phool",    sub:"The Detail That Dazzles",  occasion:["wedding","reception"],  tag:"22KT Gold",     metal:"22 KT Yellow Gold",         weight:"18.6 g",  pieces:2, piecesList:"Hand Harness (pair)",                                     price:124000, originalPrice:138000, rating:4.5, reviews:98,  badge:"New",        img:"https://picsum.photos/600/700?random=216", imgs:["https://picsum.photos/600/700?random=216","https://picsum.photos/600/700?random=217"], description:"Colombian emerald centre stones surrounded by diamond halos on a gold hand-chain. The finishing touch that makes the bridal look complete." },
+  { id:"s1", name:"Rani Haar Bridal Set",          sub:"The Grand Entrance",      occasion:["wedding"],             tag:"22KT Gold",    metal:"22 KT Yellow Gold",         weight:"98.4 g", pieces:5, piecesList:"Necklace · Earrings · Maang Tikka · Nose Ring · Bangles",  price:524000, originalPrice:578000, rating:4.9, reviews:312, badge:"Bestseller", img:"https://picsum.photos/600/700?random=201", imgs:["https://picsum.photos/600/700?random=201","https://picsum.photos/600/700?random=202","https://picsum.photos/600/700?random=203"], description:"A statement bridal set crafted in 22KT gold, adorned with hand-set polki diamonds and meenakari enamel work. Made for the bride who commands every room." },
+  { id:"s2", name:"Solitaire Engagement Ring",     sub:"The Promise",             occasion:["engagement"],          tag:"18KT Diamond", metal:"18 KT White Gold",          weight:"4.2 g",  pieces:1, piecesList:"Ring",                                                      price:185000, originalPrice:185000, rating:4.8, reviews:246, badge:"New",        img:"https://picsum.photos/600/700?random=204", imgs:["https://picsum.photos/600/700?random=204","https://picsum.photos/600/700?random=205"], description:"A 1.2 ct VVS2 round brilliant diamond set in an 18KT white gold cathedral mount. Certified by IGI. The ring she has always imagined." },
+  { id:"s3", name:"Floral Meenakari Choker",       sub:"The Mehendi Morning",     occasion:["mehendi","sangeet"],   tag:"22KT Gold",    metal:"22 KT Yellow Gold",         weight:"42.6 g", pieces:3, piecesList:"Choker · Earrings · Maang Tikka",                          price:236000, originalPrice:258000, rating:4.7, reviews:189, badge:"Limited",    img:"https://picsum.photos/600/700?random=206", imgs:["https://picsum.photos/600/700?random=206","https://picsum.photos/600/700?random=207"], description:"Vivid meenakari enamel flowers in turquoise and coral set in a 22KT gold choker. Perfect for the colourful celebrations before the big day." },
+  { id:"s4", name:"Diamond Mangalsutra",           sub:"The Sacred Bond",         occasion:["wedding"],             tag:"18KT Diamond", metal:"18 KT Yellow & Black Gold", weight:"9.8 g",  pieces:1, piecesList:"Mangalsutra",                                              price:98500,  originalPrice:112000, rating:4.9, reviews:421, badge:"Bestseller", img:"https://picsum.photos/600/700?random=208", imgs:["https://picsum.photos/600/700?random=208","https://picsum.photos/600/700?random=209"], description:"Contemporary mangalsutra with VS clarity diamonds set between traditional black bead strands. A timeless symbol reimagined for the modern bride." },
+  { id:"s5", name:"Kundan Polki Necklace Set",     sub:"The Royal Sangeet",       occasion:["sangeet","reception"], tag:"22KT Gold",    metal:"22 KT Yellow Gold",         weight:"68.2 g", pieces:4, piecesList:"Necklace · Earrings · Maang Tikka · Ring",                price:368000, originalPrice:395000, rating:4.8, reviews:178, badge:null,          img:"https://picsum.photos/600/700?random=210", imgs:["https://picsum.photos/600/700?random=210","https://picsum.photos/600/700?random=211"], description:"Uncut polki diamonds set in the classic Kundan technique. Each stone hand-placed by our artisans over 120 hours of careful craftsmanship." },
+  { id:"s6", name:"Pearl & Diamond Reception Set", sub:"The Grand Finale",        occasion:["reception"],           tag:"18KT Diamond", metal:"18 KT White Gold",          weight:"22.4 g", pieces:3, piecesList:"Necklace · Earrings · Bracelet",                           price:295000, originalPrice:295000, rating:4.6, reviews:134, badge:"Exclusive",   img:"https://picsum.photos/600/700?random=212", imgs:["https://picsum.photos/600/700?random=212","https://picsum.photos/600/700?random=213"], description:"South Sea pearls paired with diamond pavé in 18KT white gold. Understated luxury for the reception evening." },
+  { id:"s7", name:"Gold Kada Bangle Set",          sub:"The Everyday Bride",      occasion:["mehendi","honeymoon"], tag:"22KT Gold",    metal:"22 KT Yellow Gold",         weight:"56.0 g", pieces:6, piecesList:"6 Bangles",                                                price:312000, originalPrice:340000, rating:4.7, reviews:267, badge:null,          img:"https://picsum.photos/600/700?random=214", imgs:["https://picsum.photos/600/700?random=214","https://picsum.photos/600/700?random=215"], description:"A set of six hand-engraved gold kadas with delicate floral motifs. Stack them together or wear one — beautiful either way." },
+  { id:"s8", name:"Emerald Gold Haath Phool",      sub:"The Detail That Dazzles", occasion:["wedding","reception"], tag:"22KT Gold",    metal:"22 KT Yellow Gold",         weight:"18.6 g", pieces:2, piecesList:"Hand Harness (pair)",                                      price:124000, originalPrice:138000, rating:4.5, reviews:98,  badge:"New",        img:"https://picsum.photos/600/700?random=216", imgs:["https://picsum.photos/600/700?random=216","https://picsum.photos/600/700?random=217"], description:"Colombian emerald centre stones surrounded by diamond halos on a gold hand-chain. The finishing touch that makes the bridal look complete." },
 ];
 
-const heroSlides = [
-  { img:"https://picsum.photos/1600/900?random=401", eyebrow:"2025 Bridal Collection", title:"Crafted for\nYour",        em:"Greatest Day"   },
-  { img:"https://picsum.photos/1600/900?random=402", eyebrow:"The Engagement Edit",    title:"A Promise\nSet in",        em:"Gold & Diamond" },
-  { img:"https://picsum.photos/1600/900?random=403", eyebrow:"Heritage Craftsmanship", title:"Timeless Beauty\nFor Your",em:"Every Ritual"   },
+const HERO_SLIDES = [
+  { img:"https://picsum.photos/1600/900?random=401", eyebrow:"2025 Bridal Collection", title:"Crafted for\nYour",         em:"Greatest Day"   },
+  { img:"https://picsum.photos/1600/900?random=402", eyebrow:"The Engagement Edit",    title:"A Promise\nSet in",         em:"Gold & Diamond" },
+  { img:"https://picsum.photos/1600/900?random=403", eyebrow:"Heritage Craftsmanship", title:"Timeless Beauty\nFor Your", em:"Every Ritual"   },
 ];
 
-const journeySteps = [
-  { num:"01", title:"Engagement",  desc:"Solitaires & couple rings that mark the beginning"       },
+const JOURNEY = [
+  { num:"01", title:"Engagement",  desc:"Solitaires & couple rings that mark the beginning"          },
   { num:"02", title:"Mehendi",     desc:"Colourful meenakari & floral pieces for the joyful morning" },
-  { num:"03", title:"Sangeet",     desc:"Polki & kundan sets to dazzle under the lights"            },
-  { num:"04", title:"Wedding Day", desc:"Grand bridal sets — your most important look"              },
-  { num:"05", title:"Reception",   desc:"Diamonds & pearls for a refined evening statement"         },
-  { num:"06", title:"Honeymoon",   desc:"Wearable everyday pieces that travel with your story"      },
+  { num:"03", title:"Sangeet",     desc:"Polki & kundan sets to dazzle under the lights"             },
+  { num:"04", title:"Wedding Day", desc:"Grand bridal sets — your most important look"               },
+  { num:"05", title:"Reception",   desc:"Diamonds & pearls for a refined evening statement"          },
+  { num:"06", title:"Honeymoon",   desc:"Wearable everyday pieces that travel with your story"       },
 ];
 
-const testimonials = [
-  { name:"Priya S.",  city:"Mumbai",    text:"The Rani Haar set was exactly what I dreamed of for my wedding. The craftsmanship is unlike anything I've seen. Every guest asked where it was from.", rating:5, set:"Rani Haar Bridal Set",       img:"https://picsum.photos/80/80?random=301" },
-  { name:"Aarti M.",  city:"Delhi",     text:"I wore the Kundan Polki set for my sangeet and I've never felt more beautiful. My mother cried when she saw me in it.",                               rating:5, set:"Kundan Polki Necklace Set",  img:"https://picsum.photos/80/80?random=302" },
-  { name:"Sneha R.",  city:"Bangalore", text:"The diamond mangalsutra is perfect — modern yet traditional. I wear it every single day and get compliments constantly.",                              rating:5, set:"Diamond Mangalsutra",        img:"https://picsum.photos/80/80?random=303" },
+const TESTIMONIALS = [
+  { name:"Priya S.",  city:"Mumbai",    text:"The Rani Haar set was exactly what I dreamed of. The craftsmanship is unlike anything I've seen. Every guest asked where it was from.", rating:5, set:"Rani Haar Bridal Set",      img:"https://picsum.photos/80/80?random=301" },
+  { name:"Aarti M.",  city:"Delhi",     text:"I wore the Kundan Polki set for my sangeet and I've never felt more beautiful. My mother cried when she saw me in it.",                 rating:5, set:"Kundan Polki Necklace Set", img:"https://picsum.photos/80/80?random=302" },
+  { name:"Sneha R.",  city:"Bangalore", text:"The diamond mangalsutra is perfect — modern yet traditional. I wear it every single day and get compliments constantly.",                rating:5, set:"Diamond Mangalsutra",       img:"https://picsum.photos/80/80?random=303" },
 ];
 
-/* ──────────────────────────────────────────
+/* ════════════════════════════════════════
    HELPERS
-────────────────────────────────────────── */
-function fmt(n) { return "₹\u202F" + n.toLocaleString("en-IN"); }
+════════════════════════════════════════ */
+const fmt = n => "₹\u202F" + n.toLocaleString("en-IN");
 
-/* Map a Product doc (from API) → set shape used by components */
-function apiProductToSet(p) {
+function apiToSet(p) {
   return {
-    id:            p._id,
-    _id:           p._id,
-    slug:          p.slug,
+    id: p._id, _id: p._id, slug: p.slug,
     name:          p.name,
-    sub:           p.description?.slice(0, 60) + "…" || "",
+    sub:           (p.description || "").slice(0, 65) + (p.description?.length > 65 ? "…" : ""),
     occasion:      (p.occasion || []).map(o => o.toLowerCase()),
     tag:           `${p.metal?.purity || ""} ${p.metal?.type || "Gold"}`.trim(),
     metal:         `${p.metal?.purity || ""} ${p.metal?.type || "Gold"}`.trim(),
     weight:        p.metal?.weight ? `${p.metal.weight} g` : "—",
-    pieces:        1,
-    piecesList:    p.category || "",
-    price:         p.price?.current || 0,
+    pieces:        p.pieces || 1,
+    piecesList:    p.piecesList || p.category || "",
+    price:         p.price?.current  || 0,
     originalPrice: p.price?.original || p.price?.current || 0,
-    rating:        p.rating || 0,
+    rating:        p.rating      || 0,
     reviews:       p.reviewCount || 0,
-    badge:         p.isBestSeller ? "Bestseller" : p.isNewArrival ? "New" : null,
-    img:           p.thumbnail || p.images?.[0] || "",
+    badge:         p.badge || (p.isBestSeller ? "Bestseller" : p.isNewArrival ? "New" : null),
+    img:           p.thumbnail  || p.images?.[0] || "",
     imgs:          p.images?.length ? p.images : [p.thumbnail].filter(Boolean),
     description:   p.description || "",
   };
@@ -84,35 +80,61 @@ function apiProductToSet(p) {
 
 function Stars({ n, size = 13 }) {
   return (
-    <div style={{ display:"flex", gap:3 }}>
+    <div style={{ display:"flex", gap:2 }}>
       {[1,2,3,4,5].map(i => (
-        <span key={i} style={{ fontSize:size, color: i <= Math.round(n) ? "#B8862A" : "#E8DDD0" }}>★</span>
+        <span key={i} style={{ fontSize:size, color: i <= Math.round(n) ? "#B8862A" : "#E8DDD0", lineHeight:1 }}>★</span>
       ))}
     </div>
   );
 }
 
-/* ──────────────────────────────────────────
-   TOAST NOTIFICATION
-────────────────────────────────────────── */
+/* ════════════════════════════════════════
+   SKELETON
+════════════════════════════════════════ */
+function Skeleton({ h = 16, w = "100%", r = 3, mb = 0 }) {
+  return <div style={{ height:h, width:w, borderRadius:r, marginBottom:mb, background:"linear-gradient(90deg,#F5EDE3 25%,#EDE4D8 50%,#F5EDE3 75%)", backgroundSize:"800px 100%", animation:"wbsk 1.4s infinite linear" }} />;
+}
+
+function FeaturedSkeleton() {
+  return (
+    <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", border:"1px solid #E8DDD0", background:"#fff", marginBottom:32, minHeight:520 }}>
+      <Skeleton h="100%" r={0} />
+      <div style={{ padding:48, display:"flex", flexDirection:"column", gap:14, justifyContent:"center" }}>
+        <Skeleton h={10} w={80} />
+        <Skeleton h={36} w="80%" />
+        <Skeleton h={14} w="60%" />
+        <Skeleton h={80} />
+        <Skeleton h={60} />
+        <Skeleton h={40} />
+        <Skeleton h={52} />
+      </div>
+    </div>
+  );
+}
+
+function CardSkeleton() {
+  return (
+    <div style={{ background:"#fff", border:"1px solid #EDE4D8", overflow:"hidden" }}>
+      <Skeleton h={300} r={0} />
+      <div style={{ padding:16, display:"flex", flexDirection:"column", gap:10 }}>
+        <Skeleton h={10} w={80} />
+        <Skeleton h={20} w="90%" />
+        <Skeleton h={12} w="70%" />
+        <Skeleton h={24} />
+      </div>
+    </div>
+  );
+}
+
+/* ════════════════════════════════════════
+   TOAST
+════════════════════════════════════════ */
 function Toast({ toasts }) {
   return (
-    <div style={{ position:"fixed", bottom:28, right:24, zIndex:200, display:"flex", flexDirection:"column", gap:10, pointerEvents:"none" }}>
+    <div style={{ position:"fixed", bottom:28, right:24, zIndex:300, display:"flex", flexDirection:"column", gap:10, pointerEvents:"none" }}>
       {toasts.map(t => (
-        <div key={t.id} style={{
-          display:"flex", alignItems:"center", gap:10,
-          background: t.type === "error" ? "#993C1D" : "#2C1A0E",
-          color: t.type === "error" ? "#FAECE7" : "#D4AF6A",
-          padding:"12px 20px", fontSize:13, borderRadius:3,
-          boxShadow:"0 8px 32px rgba(0,0,0,0.25)",
-          animation:"wb-toast-in .25s ease",
-          fontFamily:"'Jost',sans-serif", letterSpacing:.3,
-          pointerEvents:"all",
-        }}>
-          {t.type === "error"
-            ? <AlertCircle size={14} />
-            : <CheckCircle size={14} />
-          }
+        <div key={t.id} style={{ display:"flex", alignItems:"center", gap:10, background: t.type==="error" ? "#993C1D" : "#2C1A0E", color: t.type==="error" ? "#FAECE7" : "#D4AF6A", padding:"12px 20px", fontSize:13, borderRadius:3, boxShadow:"0 8px 32px rgba(0,0,0,.25)", animation:"wb-toast-in .25s ease", fontFamily:"'Jost',sans-serif", pointerEvents:"all" }}>
+          {t.type === "error" ? <AlertCircle size={14}/> : <CheckCircle size={14}/>}
           {t.msg}
         </div>
       ))}
@@ -120,31 +142,28 @@ function Toast({ toasts }) {
   );
 }
 
-/* ──────────────────────────────────────────
+/* ════════════════════════════════════════
    FEATURED CARD
-────────────────────────────────────────── */
+════════════════════════════════════════ */
 function FeaturedCard({ set, wishlisted, onWish, onAddCart, addingId }) {
   const [activeImg, setActiveImg] = useState(0);
   const imgs = set.imgs?.length ? set.imgs : [set.img].filter(Boolean);
-  const isAdding = addingId === set.id;
+  const isAdding = addingId === (set.id || set._id);
 
   return (
     <div className="wb-featured">
-      {/* Images */}
       <div className="wb-featured-imgs">
         <img src={imgs[activeImg] || set.img} alt={set.name} className="wb-featured-main-img" />
         {set.badge && <span className="wb-featured-badge">{set.badge}</span>}
         {imgs.length > 1 && (
           <div className="wb-featured-thumb-row">
             {imgs.map((img, i) => (
-              <img key={i} src={img} alt="" className={`wb-featured-thumb${activeImg === i ? " active" : ""}`}
-                onClick={() => setActiveImg(i)} />
+              <img key={i} src={img} alt="" className={`wb-featured-thumb${activeImg===i?" active":""}`} onClick={() => setActiveImg(i)} />
             ))}
           </div>
         )}
       </div>
 
-      {/* Info */}
       <div className="wb-featured-body">
         <p className="wb-featured-eyebrow">Featured Collection</p>
         <div className="wb-featured-occasion-pills">
@@ -159,18 +178,9 @@ function FeaturedCard({ set, wishlisted, onWish, onAddCart, addingId }) {
         <p className="wb-featured-desc">{set.description}</p>
 
         <div className="wb-featured-specs">
-          <div className="wb-featured-spec">
-            <p className="wb-featured-spec-label">Metal</p>
-            <p className="wb-featured-spec-val">{set.metal}</p>
-          </div>
-          <div className="wb-featured-spec">
-            <p className="wb-featured-spec-label">Gross Weight</p>
-            <p className="wb-featured-spec-val">{set.weight}</p>
-          </div>
-          <div className="wb-featured-spec">
-            <p className="wb-featured-spec-label">Pieces</p>
-            <p className="wb-featured-spec-val">{set.pieces} pc</p>
-          </div>
+          <div className="wb-featured-spec"><p className="wb-featured-spec-label">Metal</p><p className="wb-featured-spec-val">{set.metal}</p></div>
+          <div className="wb-featured-spec"><p className="wb-featured-spec-label">Gross Weight</p><p className="wb-featured-spec-val">{set.weight}</p></div>
+          <div className="wb-featured-spec"><p className="wb-featured-spec-label">Pieces</p><p className="wb-featured-spec-val">{set.pieces} pc</p></div>
         </div>
 
         <div className="wb-featured-stars">
@@ -183,43 +193,24 @@ function FeaturedCard({ set, wishlisted, onWish, onAddCart, addingId }) {
         <div className="wb-featured-price-row">
           <span className="wb-featured-price">{fmt(set.price)}</span>
           {set.originalPrice > set.price && (
-            <>
-              <span className="wb-featured-orig">{fmt(set.originalPrice)}</span>
-              <span className="wb-featured-save">Save {fmt(set.originalPrice - set.price)}</span>
-            </>
+            <><span className="wb-featured-orig">{fmt(set.originalPrice)}</span><span className="wb-featured-save">Save {fmt(set.originalPrice - set.price)}</span></>
           )}
         </div>
 
-        {set.piecesList && (
-          <p style={{ fontSize:11, color:"#9E8875", marginBottom:20 }}>{set.piecesList}</p>
-        )}
+        {set.piecesList && <p style={{ fontSize:11, color:"#9E8875", marginBottom:20 }}>{set.piecesList}</p>}
 
         <div className="wb-featured-btns">
-          <button
-            className="wb-btn-gold"
-            onClick={() => onAddCart(set)}
-            disabled={isAdding}
-          >
-            {isAdding
-              ? <><Loader2 size={13} className="wb-spin" /> Adding…</>
-              : <><ShoppingBag size={13} /> Add to Cart</>
-            }
+          <button className="wb-btn-gold" onClick={() => onAddCart(set)} disabled={isAdding}>
+            {isAdding ? <><Loader2 size={13} className="wb-spin"/> Adding…</> : <><ShoppingBag size={13}/> Add to Cart</>}
           </button>
-          <button
-            className={`wb-btn-wish${wishlisted ? " active" : ""}`}
-            onClick={() => onWish(set.id || set._id)}
-          >
-            <Heart size={16} fill={wishlisted ? "#c0392b" : "none"} color={wishlisted ? "#c0392b" : "#9E8875"} />
+          <button className={`wb-btn-wish${wishlisted?" active":""}`} onClick={() => onWish(set.id||set._id)}>
+            <Heart size={16} fill={wishlisted?"#c0392b":"none"} color={wishlisted?"#c0392b":"#9E8875"}/>
           </button>
         </div>
 
-        {/* View detail link if slug exists */}
         {set.slug && (
-          <Link
-            href={`/product?slug=${set.slug}`}
-            style={{ display:"flex", alignItems:"center", gap:6, marginTop:14, fontSize:11, letterSpacing:2, textTransform:"uppercase", color:"#B8862A", textDecoration:"none" }}
-          >
-            View Full Details <ArrowRight size={12} />
+          <Link href={`/product?slug=${set.slug}`} style={{ display:"flex", alignItems:"center", gap:6, marginTop:14, fontSize:11, letterSpacing:2, textTransform:"uppercase", color:"#B8862A", textDecoration:"none" }}>
+            View Full Details <ArrowRight size={12}/>
           </Link>
         )}
       </div>
@@ -227,44 +218,34 @@ function FeaturedCard({ set, wishlisted, onWish, onAddCart, addingId }) {
   );
 }
 
-/* ──────────────────────────────────────────
+/* ════════════════════════════════════════
    GRID CARD
-────────────────────────────────────────── */
+════════════════════════════════════════ */
 function SetCard({ set, wishlisted, onWish, onAddCart, addingId }) {
-  const isAdding = addingId === set.id;
-
+  const isAdding = addingId === (set.id || set._id);
   return (
     <div className="wb-card">
       <div className="wb-card-img-wrap">
         <img src={set.img} alt={set.name} className="wb-card-img" />
         {set.badge && <span className="wb-card-badge">{set.badge}</span>}
-
-        {/* Wishlist btn */}
-        <button
-          className={`wb-card-wish${wishlisted ? " active" : ""}`}
-          onClick={e => { e.stopPropagation(); onWish(set.id || set._id); }}
-        >
-          <Heart size={14} fill={wishlisted ? "#c0392b" : "none"} color={wishlisted ? "#c0392b" : "#4A3728"} />
+        <button className={`wb-card-wish${wishlisted?" active":""}`} onClick={e => { e.stopPropagation(); onWish(set.id||set._id); }}>
+          <Heart size={14} fill={wishlisted?"#c0392b":"none"} color={wishlisted?"#c0392b":"#4A3728"}/>
         </button>
-
-        {/* Occasion pills */}
         <div className="wb-card-occasions">
-          {set.occasion.slice(0, 2).map(o => (
-            <span key={o} className="wb-card-occ-pill">
-              {occasions.find(oc => oc.id === o)?.label ?? o}
-            </span>
+          {set.occasion.slice(0,2).map(o => (
+            <span key={o} className="wb-card-occ-pill">{occasions.find(oc=>oc.id===o)?.label ?? o}</span>
           ))}
         </div>
       </div>
 
       <div className="wb-card-body">
-        <p className="wb-card-tag">{set.tag}{set.pieces > 1 ? ` · ${set.pieces} Piece Set` : ""}</p>
+        <p className="wb-card-tag">{set.tag}{set.pieces>1?` · ${set.pieces} Piece Set`:""}</p>
         <p className="wb-card-name">{set.name}</p>
         <p className="wb-card-sub">{set.sub}</p>
         <p className="wb-card-meta">{set.metal} · {set.weight}</p>
 
         <div className="wb-card-stars">
-          <Stars n={set.rating} size={11} />
+          <Stars n={set.rating} size={11}/>
           <span className="wb-card-rating">{set.rating}</span>
           <span className="wb-card-reviews">({set.reviews})</span>
         </div>
@@ -272,27 +253,15 @@ function SetCard({ set, wishlisted, onWish, onAddCart, addingId }) {
         <div className="wb-card-footer">
           <div>
             <span className="wb-card-price">{fmt(set.price)}</span>
-            {set.originalPrice > set.price && (
-              <span className="wb-card-orig">{fmt(set.originalPrice)}</span>
-            )}
+            {set.originalPrice > set.price && <span className="wb-card-orig">{fmt(set.originalPrice)}</span>}
           </div>
-          <button
-            className="wb-card-add"
-            onClick={() => onAddCart(set)}
-            disabled={isAdding}
-          >
-            {isAdding
-              ? <Loader2 size={10} className="wb-spin" />
-              : <><ShoppingBag size={10} /> Add</>
-            }
+          <button className="wb-card-add" onClick={() => onAddCart(set)} disabled={isAdding}>
+            {isAdding ? <Loader2 size={10} className="wb-spin"/> : <><ShoppingBag size={10}/> Add</>}
           </button>
         </div>
 
         {set.slug && (
-          <Link
-            href={`/product?slug=${set.slug}`}
-            style={{ display:"block", marginTop:10, fontSize:10.5, color:"#B8862A", letterSpacing:1, textDecoration:"none", textTransform:"uppercase" }}
-          >
+          <Link href={`/product?slug=${set.slug}`} style={{ display:"block", marginTop:10, fontSize:10.5, color:"#B8862A", letterSpacing:1, textDecoration:"none", textTransform:"uppercase" }}>
             View Details →
           </Link>
         )}
@@ -301,9 +270,9 @@ function SetCard({ set, wishlisted, onWish, onAddCart, addingId }) {
   );
 }
 
-/* ──────────────────────────────────────────
+/* ════════════════════════════════════════
    STYLES
-────────────────────────────────────────── */
+════════════════════════════════════════ */
 const S = `
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,600&family=Jost:wght@300;400;500&display=swap');
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -314,25 +283,31 @@ const S = `
 .wb-hero-slides{position:absolute;inset:0;}
 .wb-hero-slide{position:absolute;inset:0;opacity:0;transition:opacity 1.4s ease;}
 .wb-hero-slide.active{opacity:1;}
-.wb-hero-slide img{width:100%;height:100%;object-fit:cover;filter:brightness(0.5);}
-.wb-hero-overlay{position:absolute;inset:0;background:linear-gradient(110deg,rgba(20,8,2,0.92) 0%,rgba(20,8,2,0.5) 55%,transparent 100%);}
+.wb-hero-slide img{width:100%;height:100%;object-fit:cover;filter:brightness(.5);transition:transform 8s ease;}
+.wb-hero-slide.active img{transform:scale(1.04);}
+.wb-hero-overlay{position:absolute;inset:0;background:linear-gradient(110deg,rgba(20,8,2,.92) 0%,rgba(20,8,2,.5) 55%,transparent 100%);}
 .wb-hero-frame{position:absolute;inset:24px;pointer-events:none;z-index:4;}
-.wb-hero-frame-tl{position:absolute;top:0;left:0;width:44px;height:44px;border-top:1px solid rgba(212,175,106,0.55);border-left:1px solid rgba(212,175,106,0.55);}
-.wb-hero-frame-tr{position:absolute;top:0;right:0;width:44px;height:44px;border-top:1px solid rgba(212,175,106,0.55);border-right:1px solid rgba(212,175,106,0.55);}
-.wb-hero-frame-bl{position:absolute;bottom:0;left:0;width:44px;height:44px;border-bottom:1px solid rgba(212,175,106,0.55);border-left:1px solid rgba(212,175,106,0.55);}
-.wb-hero-frame-br{position:absolute;bottom:0;right:0;width:44px;height:44px;border-bottom:1px solid rgba(212,175,106,0.55);border-right:1px solid rgba(212,175,106,0.55);}
-.wb-hero-content{position:relative;z-index:5;max-width:680px;padding:0 80px;}
+.wb-hero-frame-tl{position:absolute;top:0;left:0;width:44px;height:44px;border-top:1px solid rgba(212,175,106,.55);border-left:1px solid rgba(212,175,106,.55);}
+.wb-hero-frame-tr{position:absolute;top:0;right:0;width:44px;height:44px;border-top:1px solid rgba(212,175,106,.55);border-right:1px solid rgba(212,175,106,.55);}
+.wb-hero-frame-bl{position:absolute;bottom:0;left:0;width:44px;height:44px;border-bottom:1px solid rgba(212,175,106,.55);border-left:1px solid rgba(212,175,106,.55);}
+.wb-hero-frame-br{position:absolute;bottom:0;right:0;width:44px;height:44px;border-bottom:1px solid rgba(212,175,106,.55);border-right:1px solid rgba(212,175,106,.55);}
+.wb-hero-content{position:relative;z-index:5;max-width:700px;padding:0 80px;}
 .wb-hero-eyebrow{display:inline-flex;align-items:center;gap:12px;font-size:10px;letter-spacing:4px;text-transform:uppercase;color:#D4AF6A;margin-bottom:22px;}
 .wb-hero-eyebrow::before{content:'';display:block;width:36px;height:1px;background:linear-gradient(90deg,transparent,#D4AF6A);}
-.wb-hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(50px,6.5vw,86px);font-weight:300;color:#FFFDF9;line-height:1.05;margin-bottom:22px;letter-spacing:.5px;}
+.wb-hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(50px,6.5vw,86px);font-weight:300;color:#FFFDF9;line-height:1.05;margin-bottom:22px;}
 .wb-hero-title em{font-style:italic;color:#D4AF6A;display:block;font-weight:300;}
 .wb-hero-desc{font-size:15px;font-weight:300;color:#C8B89A;line-height:1.8;margin-bottom:40px;max-width:480px;}
 .wb-hero-btns{display:flex;gap:14px;flex-wrap:wrap;}
-.wb-hero-btn-primary{display:inline-flex;align-items:center;gap:10px;background:#B8862A;color:#FFFDF9;border:none;padding:15px 34px;font-family:'Jost',sans-serif;font-size:11px;font-weight:500;letter-spacing:2.5px;text-transform:uppercase;cursor:pointer;text-decoration:none;transition:background .25s;box-shadow:0 4px 20px rgba(184,134,42,.35);}
+.wb-hero-btn-primary{display:inline-flex;align-items:center;gap:10px;background:#B8862A;color:#FFFDF9;border:none;padding:15px 34px;font-family:'Jost',sans-serif;font-size:11px;font-weight:500;letter-spacing:2.5px;text-transform:uppercase;cursor:pointer;text-decoration:none;transition:all .25s;box-shadow:0 4px 20px rgba(184,134,42,.35);}
 .wb-hero-btn-primary:hover{background:#D4AF6A;color:#2C1A0E;}
 .wb-hero-btn-outline{display:inline-flex;align-items:center;gap:10px;background:transparent;color:#D4AF6A;border:1px solid rgba(212,175,106,.55);padding:15px 34px;font-family:'Jost',sans-serif;font-size:11px;font-weight:500;letter-spacing:2.5px;text-transform:uppercase;cursor:pointer;text-decoration:none;transition:all .25s;}
 .wb-hero-btn-outline:hover{background:rgba(212,175,106,.1);border-color:#D4AF6A;}
-.wb-hero-dots{position:absolute;bottom:36px;left:80px;display:flex;gap:10px;z-index:5;}
+/* Hero nav arrows */
+.wb-hero-arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:5;background:rgba(255,255,255,.08);border:1px solid rgba(212,175,106,.3);color:#D4AF6A;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .25s;backdrop-filter:blur(4px);}
+.wb-hero-arrow:hover{background:rgba(212,175,106,.18);border-color:#D4AF6A;}
+.wb-hero-arrow.left{left:28px;}
+.wb-hero-arrow.right{right:28px;}
+.wb-hero-dots{position:absolute;bottom:36px;left:50%;transform:translateX(-50%);display:flex;gap:10px;z-index:5;}
 .wb-hero-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.3);cursor:pointer;transition:all .35s;border:none;padding:0;}
 .wb-hero-dot.active{background:#D4AF6A;width:24px;border-radius:3px;}
 .wb-hero-scroll{position:absolute;bottom:32px;right:60px;z-index:5;display:flex;flex-direction:column;align-items:center;gap:6px;}
@@ -340,7 +315,7 @@ const S = `
 .wb-hero-scroll-text{font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,.35);}
 .wb-gold-line{height:1px;background:linear-gradient(90deg,transparent,#B8862A 20%,#E8C96A 50%,#B8862A 80%,transparent);}
 
-/* FILTER */
+/* FILTER STRIP */
 .wb-filter-strip{background:#2C1A0E;position:sticky;top:95px;z-index:30;border-bottom:1px solid rgba(184,134,42,.3);box-shadow:0 4px 24px rgba(0,0,0,.25);}
 .wb-filter-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;overflow-x:auto;scrollbar-width:none;}
 .wb-filter-inner::-webkit-scrollbar{display:none;}
@@ -380,7 +355,7 @@ const S = `
 .wb-featured-title{font-family:'Cormorant Garamond',serif;font-size:clamp(28px,3vw,40px);font-weight:400;color:#2C1A0E;line-height:1.15;margin-bottom:5px;}
 .wb-featured-sub{font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;color:#B8862A;margin-bottom:18px;}
 .wb-featured-desc{font-size:13px;color:#7A6656;line-height:1.8;font-weight:300;margin-bottom:24px;}
-.wb-featured-specs{display:flex;gap:0;margin-bottom:28px;border:1px solid #EDE4D8;}
+.wb-featured-specs{display:flex;margin-bottom:28px;border:1px solid #EDE4D8;}
 .wb-featured-spec{flex:1;padding:14px 18px;border-right:1px solid #EDE4D8;}
 .wb-featured-spec:last-child{border-right:none;}
 .wb-featured-spec-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#9E8875;margin-bottom:4px;}
@@ -391,7 +366,7 @@ const S = `
 .wb-featured-orig{font-size:15px;color:#B0A090;text-decoration:line-through;}
 .wb-featured-save{font-size:11px;color:#2e7d32;font-weight:500;background:rgba(46,125,50,.07);padding:3px 10px;border:1px solid rgba(46,125,50,.15);}
 .wb-featured-btns{display:grid;grid-template-columns:1fr auto;gap:10px;}
-.wb-btn-gold{display:flex;align-items:center;justify-content:center;gap:9px;background:#2C1A0E;color:#D4AF6A;border:none;padding:15px;font-family:'Jost',sans-serif;font-size:10px;font-weight:500;letter-spacing:2.5px;text-transform:uppercase;cursor:pointer;transition:background .2s;box-shadow:none;}
+.wb-btn-gold{display:flex;align-items:center;justify-content:center;gap:9px;background:#2C1A0E;color:#D4AF6A;border:none;padding:15px;font-family:'Jost',sans-serif;font-size:10px;font-weight:500;letter-spacing:2.5px;text-transform:uppercase;cursor:pointer;transition:background .2s;}
 .wb-btn-gold:hover:not(:disabled){background:#B8862A;color:#fff;}
 .wb-btn-gold:disabled{opacity:.6;cursor:not-allowed;}
 .wb-btn-wish{background:none;border:1px solid #E8DDD0;padding:15px 18px;cursor:pointer;color:#9E8875;transition:all .2s;display:flex;align-items:center;}
@@ -410,7 +385,6 @@ const S = `
 .wb-card-badge{position:absolute;top:12px;left:12px;z-index:1;background:rgba(44,26,14,.85);color:#D4AF6A;font-size:9px;letter-spacing:2px;padding:5px 12px;text-transform:uppercase;}
 .wb-card-wish{position:absolute;top:10px;right:10px;z-index:1;background:rgba(255,255,255,.92);border:none;border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;}
 .wb-card-wish:hover{background:#fff;transform:scale(1.08);}
-.wb-card-wish.active{background:#fff;}
 .wb-card-occasions{position:absolute;bottom:12px;left:12px;display:flex;gap:5px;}
 .wb-card-occ-pill{background:rgba(44,26,14,.72);color:#D4AF6A;font-size:9px;letter-spacing:1px;padding:3px 9px;text-transform:uppercase;backdrop-filter:blur(4px);}
 .wb-card-body{padding:18px 20px 20px;}
@@ -478,105 +452,100 @@ const S = `
 .wb-cta-btn-b{display:inline-flex;align-items:center;gap:9px;background:transparent;color:#D4AF6A;border:1px solid rgba(212,175,106,.4);padding:16px 38px;font-family:'Jost',sans-serif;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;cursor:pointer;transition:all .2s;text-decoration:none;}
 .wb-cta-btn-b:hover{background:rgba(212,175,106,.08);border-color:#D4AF6A;}
 
-/* EMPTY */
+/* MISC */
 .wb-empty{text-align:center;padding:80px 20px;background:#fff;border:1px solid #E8DDD0;}
 .wb-empty-icon{font-size:48px;margin-bottom:16px;}
 .wb-empty-title{font-family:'Cormorant Garamond',serif;font-size:30px;color:#2C1A0E;margin-bottom:8px;}
 .wb-empty-sub{font-size:13px;color:#9E8875;}
 
-/* Loader skeleton */
-.wb-skeleton{background:linear-gradient(90deg,#F5EDE3 25%,#EDE4D8 50%,#F5EDE3 75%);background-size:800px 100%;animation:wb-sk 1.4s infinite linear;border-radius:4px;}
-@keyframes wb-sk{0%{background-position:-800px 0}100%{background-position:800px 0}}
+/* Animations */
+@keyframes wbsk{0%{background-position:-800px 0}100%{background-position:800px 0}}
 @keyframes wb-toast-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-.wb-spin{animation:wb-spin-anim .8s linear infinite;}
-@keyframes wb-spin-anim{to{transform:rotate(360deg)}}
+.wb-spin{animation:wb-spin-a .8s linear infinite;}
+@keyframes wb-spin-a{to{transform:rotate(360deg)}}
 
+/* Responsive */
 @media(max-width:1100px){.wb-grid{grid-template-columns:repeat(2,1fr);}}
 @media(max-width:1000px){.wb-featured{grid-template-columns:1fr;}.wb-featured-main-img{min-height:320px;}.wb-featured-body{padding:32px 28px;}.wb-journey-track{flex-wrap:wrap;gap:28px;}.wb-journey-track::before{display:none;}.wb-journey-step{flex:0 0 calc(33.333% - 19px);}}
-@media(max-width:768px){.wb-section{padding:52px 20px;}.wb-grid{grid-template-columns:repeat(2,1fr);gap:14px;}.wb-hero-content{padding:0 24px;}.wb-hero-dots{left:24px;}.wb-hero-scroll{display:none;}.wb-filter-btn{padding:14px 18px;}.wb-testi-grid{grid-template-columns:1fr 1fr;}.wb-testi-inner{padding:0 20px;}.wb-journey-inner{padding:0 20px;}.wb-journey-step{flex:0 0 calc(50% - 14px);}.wb-cta{padding:64px 20px;}}
+@media(max-width:768px){.wb-section{padding:52px 20px;}.wb-grid{grid-template-columns:repeat(2,1fr);gap:14px;}.wb-hero-content{padding:0 24px;}.wb-hero-dots{left:50%;transform:translateX(-50%);}.wb-hero-scroll,.wb-hero-arrow{display:none;}.wb-filter-btn{padding:14px 18px;}.wb-testi-grid{grid-template-columns:1fr 1fr;}.wb-testi-inner,.wb-journey-inner{padding:0 20px;}.wb-journey-step{flex:0 0 calc(50% - 14px);}.wb-cta{padding:64px 20px;}}
 @media(max-width:560px){.wb-testi-grid{grid-template-columns:1fr;}.wb-grid{grid-template-columns:1fr;}.wb-journey-step{flex:0 0 100%;}}
 `;
 
-/* ──────────────────────────────────────────
+/* ════════════════════════════════════════
    MAIN PAGE
-────────────────────────────────────────── */
+════════════════════════════════════════ */
 export default function WeddingPage() {
   const { isLoggedIn, wishlistIds, toggleWishlist } = useAuth();
   const { addItem } = useCart();
 
   const [activeFilter, setActiveFilter] = useState("all");
   const [heroIdx,      setHeroIdx]      = useState(0);
-  const [sets,         setSets]         = useState(STATIC_SETS);
+  const [sets,         setSets]         = useState(STATIC_SETS);   // ← start with static
+  const [setsLoading,  setSetsLoading]  = useState(true);
   const [apiLoaded,    setApiLoaded]    = useState(false);
-  const [addingId,     setAddingId]     = useState(null);   // which item is being added
+  const [addingId,     setAddingId]     = useState(null);
   const [toasts,       setToasts]       = useState([]);
+  const heroTimer = useRef(null);
 
   /* ── Hero auto-advance ── */
-  useEffect(() => {
-    const t = setInterval(() => setHeroIdx(i => (i + 1) % heroSlides.length), 5000);
-    return () => clearInterval(t);
+  const startTimer = useCallback(() => {
+    clearInterval(heroTimer.current);
+    heroTimer.current = setInterval(() => setHeroIdx(i => (i + 1) % HERO_SLIDES.length), 5000);
   }, []);
+  useEffect(() => { startTimer(); return () => clearInterval(heroTimer.current); }, [startTimer]);
 
-  /* ── Fetch bridal products from API ── */
+  const goHero = useCallback((idx) => {
+    setHeroIdx(idx);
+    startTimer(); // reset timer on manual navigation
+  }, [startTimer]);
+
+  /* ── Fetch bridal products ── */
   useEffect(() => {
     productApi.getAll({ isWedding: true, limit: 12 })
       .then(({ products }) => {
         if (products?.length) {
-          setSets(products.map(apiProductToSet));
+          setSets(products.map(apiToSet));
           setApiLoaded(true);
         }
       })
-      .catch(() => { /* keep static fallback silently */ });
+      .catch(() => {}) // keep STATIC_SETS silently
+      .finally(() => setSetsLoading(false));
   }, []);
 
-  /* ── Toast helper ── */
+  /* ── Toast ── */
   const showToast = useCallback((msg, type = "success") => {
     const id = Date.now();
     setToasts(p => [...p, { id, msg, type }]);
-    setTimeout(() => setToasts(p => p.filter(t => t.id !== id)), 3000);
+    setTimeout(() => setToasts(p => p.filter(t => t.id !== id)), 3200);
   }, []);
 
   /* ── Add to cart ── */
   const handleAddCart = useCallback(async (set) => {
-    if (!isLoggedIn) {
-      showToast("Please log in to add items to cart", "error");
-      return;
-    }
-    /* Static sets don't have _id — go to listing */
-    if (!set._id && !set.slug) {
-      showToast("Please select this item from the product page", "error");
-      return;
-    }
-    setAddingId(set.id);
+    if (!isLoggedIn) { showToast("Please log in to add items to cart", "error"); return; }
+    if (!set._id && !set.slug) { showToast("View the product page to add this item", "error"); return; }
+    setAddingId(set.id || set._id);
     try {
       await addItem(set._id || set.id, 1);
       showToast(`"${set.name}" added to cart ✓`);
     } catch (err) {
       showToast(err.message || "Could not add to cart", "error");
-    } finally {
-      setAddingId(null);
-    }
+    } finally { setAddingId(null); }
   }, [isLoggedIn, addItem, showToast]);
 
-  /* ── Wishlist toggle ── */
+  /* ── Wishlist ── */
   const handleWish = useCallback(async (id) => {
-    if (!isLoggedIn) {
-      showToast("Please log in to save to wishlist", "error");
-      return;
-    }
+    if (!isLoggedIn) { showToast("Please log in to save to wishlist", "error"); return; }
     const added = await toggleWishlist(id);
     if (added === true)  showToast("Added to wishlist ♥");
     if (added === false) showToast("Removed from wishlist");
     if (added === null)  showToast("Could not update wishlist", "error");
   }, [isLoggedIn, toggleWishlist, showToast]);
 
-  /* ── Filtering ── */
-  const filteredSets = activeFilter === "all"
-    ? sets
-    : sets.filter(s => s.occasion.includes(activeFilter));
-  const featured   = filteredSets[0] ?? sets[0];
-  const gridSets   = filteredSets.slice(1);
-  const countFor   = id => id === "all" ? sets.length : sets.filter(s => s.occasion.includes(id)).length;
+  /* ── Filter ── */
+  const filteredSets = activeFilter === "all" ? sets : sets.filter(s => s.occasion.includes(activeFilter));
+  const featured     = filteredSets[0];
+  const gridSets     = filteredSets.slice(1);
+  const countFor     = id => id === "all" ? sets.length : sets.filter(s => s.occasion.includes(id)).length;
 
   return (
     <>
@@ -585,59 +554,64 @@ export default function WeddingPage() {
 
       <div className="wb-root">
 
-        {/* ── HERO ── */}
+        {/* ══ HERO ══ */}
         <div className="wb-hero">
           <div className="wb-hero-slides">
-            {heroSlides.map((slide, i) => (
-              <div key={i} className={`wb-hero-slide${heroIdx === i ? " active" : ""}`}>
+            {HERO_SLIDES.map((slide, i) => (
+              <div key={i} className={`wb-hero-slide${heroIdx===i?" active":""}`}>
                 <img src={slide.img} alt={slide.eyebrow} />
               </div>
             ))}
           </div>
           <div className="wb-hero-overlay" />
           <div className="wb-hero-frame">
-            <div className="wb-hero-frame-tl" /><div className="wb-hero-frame-tr" />
-            <div className="wb-hero-frame-bl" /><div className="wb-hero-frame-br" />
+            <div className="wb-hero-frame-tl"/><div className="wb-hero-frame-tr"/>
+            <div className="wb-hero-frame-bl"/><div className="wb-hero-frame-br"/>
           </div>
+
+          {/* Arrow nav */}
+          <button className="wb-hero-arrow left" onClick={() => goHero((heroIdx - 1 + HERO_SLIDES.length) % HERO_SLIDES.length)}>
+            <ChevronLeft size={18}/>
+          </button>
+          <button className="wb-hero-arrow right" onClick={() => goHero((heroIdx + 1) % HERO_SLIDES.length)}>
+            <ChevronRight size={18}/>
+          </button>
+
           <div className="wb-hero-content">
-            <p className="wb-hero-eyebrow">{heroSlides[heroIdx].eyebrow}</p>
+            <p className="wb-hero-eyebrow">{HERO_SLIDES[heroIdx].eyebrow}</p>
             <h1 className="wb-hero-title">
-              {heroSlides[heroIdx].title.split("\n").map((line, i) => <span key={i}>{line}<br /></span>)}
-              <em>{heroSlides[heroIdx].em}</em>
+              {HERO_SLIDES[heroIdx].title.split("\n").map((line, i) => <span key={i}>{line}<br/></span>)}
+              <em>{HERO_SLIDES[heroIdx].em}</em>
             </h1>
             <p className="wb-hero-desc">
               Handcrafted in 22KT & 18KT gold, set with the finest diamonds, emeralds, and pearls.
               Each piece made for one of life's most precious moments.
             </p>
             <div className="wb-hero-btns">
-              <a href="#collections" className="wb-hero-btn-primary">
-                Explore Collections <ArrowRight size={14} />
-              </a>
+              <a href="#collections" className="wb-hero-btn-primary">Explore Collections <ArrowRight size={14}/></a>
               <a href="#journey" className="wb-hero-btn-outline">Our Bridal Journey</a>
             </div>
           </div>
+
           <div className="wb-hero-dots">
-            {heroSlides.map((_, i) => (
-              <button key={i} className={`wb-hero-dot${heroIdx === i ? " active" : ""}`} onClick={() => setHeroIdx(i)} />
+            {HERO_SLIDES.map((_, i) => (
+              <button key={i} className={`wb-hero-dot${heroIdx===i?" active":""}`} onClick={() => goHero(i)} />
             ))}
           </div>
           <div className="wb-hero-scroll">
-            <div className="wb-hero-scroll-line" />
+            <div className="wb-hero-scroll-line"/>
             <span className="wb-hero-scroll-text">Scroll</span>
           </div>
         </div>
 
-        <div className="wb-gold-line" />
+        <div className="wb-gold-line"/>
 
-        {/* ── OCCASION FILTER BAR ── */}
+        {/* ══ FILTER ══ */}
         <div className="wb-filter-strip" id="collections">
           <div className="wb-filter-inner">
             {occasions.map(occ => (
-              <button
-                key={occ.id}
-                className={`wb-filter-btn${activeFilter === occ.id ? " active" : ""}`}
-                onClick={() => setActiveFilter(occ.id)}
-              >
+              <button key={occ.id} className={`wb-filter-btn${activeFilter===occ.id?" active":""}`}
+                onClick={() => setActiveFilter(occ.id)}>
                 {occ.label}
                 <span className="wb-filter-count">{countFor(occ.id)}</span>
               </button>
@@ -645,20 +619,19 @@ export default function WeddingPage() {
           </div>
         </div>
 
-        {/* ── COLLECTIONS ── */}
+        {/* ══ COLLECTIONS ══ */}
         <div className="wb-section">
           <div className="wb-section-label">
-            <div className="wb-section-line-l" />
+            <div className="wb-section-line-l"/>
             <span className="wb-section-tag">
               {activeFilter === "all" ? "All Collections" : occasions.find(o => o.id === activeFilter)?.label}
             </span>
-            <div className="wb-section-line" />
+            <div className="wb-section-line"/>
           </div>
           <h2 className="wb-section-title">
             {activeFilter === "all"
               ? <>Curated <em>Bridal Sets</em></>
-              : <>{occasions.find(o => o.id === activeFilter)?.label} <em>Collections</em></>
-            }
+              : <>{occasions.find(o => o.id === activeFilter)?.label} <em>Collections</em></>}
           </h2>
           <p className="wb-section-sub">
             {filteredSets.length} set{filteredSets.length !== 1 ? "s" : ""}
@@ -666,7 +639,15 @@ export default function WeddingPage() {
             {apiLoaded && <span style={{ marginLeft:8, fontSize:10, color:"#B8862A", letterSpacing:1 }}>✦ LIVE</span>}
           </p>
 
-          {filteredSets.length === 0 ? (
+          {/* Loading skeletons */}
+          {setsLoading ? (
+            <>
+              <FeaturedSkeleton />
+              <div className="wb-grid">
+                {[1,2,3].map(i => <CardSkeleton key={i} />)}
+              </div>
+            </>
+          ) : filteredSets.length === 0 ? (
             <div className="wb-empty">
               <div className="wb-empty-icon">💍</div>
               <h3 className="wb-empty-title">No sets found</h3>
@@ -682,16 +663,11 @@ export default function WeddingPage() {
                 addingId={addingId}
               />
               {gridSets.length > 0 && (
-                <div className="wb-grid" style={{ marginTop: 26 }}>
+                <div className="wb-grid" style={{ marginTop:26 }}>
                   {gridSets.map(set => (
-                    <SetCard
-                      key={set.id}
-                      set={set}
+                    <SetCard key={set.id} set={set}
                       wishlisted={wishlistIds.has(set.id || set._id)}
-                      onWish={handleWish}
-                      onAddCart={handleAddCart}
-                      addingId={addingId}
-                    />
+                      onWish={handleWish} onAddCart={handleAddCart} addingId={addingId} />
                   ))}
                 </div>
               )}
@@ -699,9 +675,9 @@ export default function WeddingPage() {
           )}
         </div>
 
-        <div className="wb-gold-line" />
+        <div className="wb-gold-line"/>
 
-        {/* ── WEDDING JOURNEY TIMELINE ── */}
+        {/* ══ JOURNEY ══ */}
         <div className="wb-journey" id="journey">
           <div className="wb-journey-inner">
             <div className="wb-journey-head">
@@ -712,7 +688,7 @@ export default function WeddingPage() {
               <p className="wb-journey-sub">From the first yes to the last dance — we have a piece for every moment</p>
             </div>
             <div className="wb-journey-track">
-              {journeySteps.map((step, i) => (
+              {JOURNEY.map((step, i) => (
                 <div key={i} className="wb-journey-step">
                   <div className="wb-journey-dot">{step.num}</div>
                   <p className="wb-journey-step-title">{step.title}</p>
@@ -723,27 +699,27 @@ export default function WeddingPage() {
           </div>
         </div>
 
-        {/* ── TESTIMONIALS ── */}
+        {/* ══ TESTIMONIALS ══ */}
         <div className="wb-testi">
           <div className="wb-testi-inner">
             <div style={{ textAlign:"center", marginBottom:48 }}>
               <div className="wb-section-label" style={{ justifyContent:"center", marginBottom:10 }}>
-                <div className="wb-section-line-l" style={{ maxWidth:100 }} />
+                <div className="wb-section-line-l" style={{ maxWidth:100 }}/>
                 <span className="wb-section-tag">Real Brides</span>
-                <div className="wb-section-line" style={{ maxWidth:100 }} />
+                <div className="wb-section-line" style={{ maxWidth:100 }}/>
               </div>
               <h2 className="wb-section-title" style={{ marginBottom:0 }}>Their <em>Stories</em></h2>
             </div>
             <div className="wb-testi-grid">
-              {testimonials.map((t, i) => (
+              {TESTIMONIALS.map((t, i) => (
                 <div key={i} className="wb-testi-card">
                   <div className="wb-testi-stars">
                     {[1,2,3,4,5].map(j => <span key={j} style={{ fontSize:12, color:"#B8862A" }}>★</span>)}
                   </div>
                   <p className="wb-testi-text">{t.text}</p>
-                  <div className="wb-testi-divider" />
+                  <div className="wb-testi-divider"/>
                   <div className="wb-testi-author">
-                    <img src={t.img} alt={t.name} className="wb-testi-avatar" />
+                    <img src={t.img} alt={t.name} className="wb-testi-avatar"/>
                     <div>
                       <p className="wb-testi-author-name">{t.name}</p>
                       <p className="wb-testi-author-meta">{t.city}</p>
@@ -756,21 +732,19 @@ export default function WeddingPage() {
           </div>
         </div>
 
-        {/* ── CTA BANNER ── */}
+        {/* ══ CTA ══ */}
         <div className="wb-cta">
-          <div className="wb-cta-frame" />
+          <div className="wb-cta-frame"/>
           <div className="wb-cta-inner">
             <span className="wb-cta-tag">Your Dream Bridal Look Awaits</span>
-            <h2 className="wb-cta-title">Book a <em>Private</em><br />Bridal Consultation</h2>
-            <div className="wb-cta-divider" />
+            <h2 className="wb-cta-title">Book a <em>Private</em><br/>Bridal Consultation</h2>
+            <div className="wb-cta-divider"/>
             <p className="wb-cta-sub">
               Visit any MANAS store for a dedicated bridal session. Our specialists will help you
               curate the perfect set for every ceremony — at your pace, in complete privacy.
             </p>
             <div className="wb-cta-btns">
-              <Link href="/contact" className="wb-cta-btn-a">
-                Book Appointment <ArrowRight size={13} />
-              </Link>
+              <Link href="/contact" className="wb-cta-btn-a">Book Appointment <ArrowRight size={13}/></Link>
               <Link href="/listing" className="wb-cta-btn-b">Browse All Jewellery</Link>
             </div>
           </div>

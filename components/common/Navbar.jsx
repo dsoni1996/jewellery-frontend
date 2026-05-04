@@ -199,12 +199,29 @@ export default function Navbar() {
     router.push(`/search?q=${encodeURIComponent(q)}`);
   };
 
-  const isActive = (href) => {
-    if (!href) return false;
-    const base = href.split("?")[0];
-    if (base === "/") return pathname === "/";
-    return pathname === base || pathname.startsWith(base + "/");
-  };
+ const isActive = (href) => {
+  if (!href) return false;
+
+  const [base, queryString] = href.split("?");
+
+  if (pathname !== base) return false;
+
+  const currentParams = new URLSearchParams(
+    typeof window !== "undefined" ? window.location.search : ""
+  );
+
+  if (!queryString) {
+    return [...currentParams.keys()].length === 0;
+  }
+
+  const hrefParams = new URLSearchParams(queryString);
+
+  for (const [key, val] of hrefParams.entries()) {
+    if (currentParams.get(key) !== val) return false;
+  }
+
+  return true;
+};
 
   /* ── Destructure live data ── */
   const { topbar, navItems = [], megaCols = [], megaImgs = [], searchHints = [] } = navData;

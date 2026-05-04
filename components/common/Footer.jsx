@@ -133,7 +133,7 @@ const Footer = () => (
         </div>
 
         {/* App Download */}
-        <div className="ft-qr">
+        {/* <div className="ft-qr">
           <p className="ft-col-title">Download App</p>
           <p className="ft-qr-title">Scan to download the MANAS app</p>
           <a href="/app" title="Download MANAS App">
@@ -142,7 +142,10 @@ const Footer = () => (
               alt="QR Code – Download MANAS App"
             />
           </a>
-        </div>
+        </div> */}
+
+        
+        
       </div>
 
       <hr className="ft-divider" />

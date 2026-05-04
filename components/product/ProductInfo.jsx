@@ -112,8 +112,8 @@ const ProductInfo = ({ product }) => {
           </div>
           <div>
             <span className="pi-option-label">Size</span>
-            {variants.sizes.map((size) => {
-              return <span className="pi-size-tag">{size}</span>;
+            {variants.sizes.map((size, index) => {
+              return <span className="pi-size-tag" key={index}>{size}</span>;
             })}
           </div>
         </div>

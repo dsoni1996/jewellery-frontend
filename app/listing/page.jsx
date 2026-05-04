@@ -3,7 +3,8 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { Loader2, X } from "lucide-react";
 import ProductCard from "../../components/common/ProductCard";
-import { useProducts } from "../../hooks";
+import { useProducts, useToast } from "../../hooks";
+import { Toast } from "@/components/common/Toast";
 
 const CATEGORIES = ["Ring","Necklace","Earring","Bangle","Bracelet","Mangalsutra","Pendant"];
 const PURITIES   = ["22KT","18KT","14KT"];
@@ -178,6 +179,7 @@ export default function ProductListing() {
     products, total, pages, page, loading,
     filters, setPage, setFilters, updateFilter,
   } = useProducts({ ...initialFilters, page: initialPage });
+  const { toasts, showToast } = useToast();
 
   // ── 2. Whenever filters or page change → push to URL ──
   // isUpdatingUrl ref: marks that WE triggered the URL change,
@@ -234,7 +236,7 @@ export default function ProductListing() {
     <>
       <style>{listingStyles}</style>
       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
-
+      <Toast toasts={toasts} />
       <div className="pl-root">
         {/* Hero */}
         <div className="pl-hero">
@@ -329,6 +331,7 @@ export default function ProductListing() {
               {products.map(item => (
                 <ProductCard
                   key={item._id}
+                  showToast={showToast}
                   product={{
                     id:       item._id,
                     slug:     item.slug,
