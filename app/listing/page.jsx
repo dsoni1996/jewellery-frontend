@@ -1,5 +1,6 @@
 "use client";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
+import { Suspense } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { Loader2, X } from "lucide-react";
 import ProductCard from "../../components/common/ProductCard";
@@ -28,8 +29,6 @@ const listingStyles = `
   .pl-hero-title em { font-style: italic; color: #D4AF6A; }
   .pl-hero-sub { font-size: 12px; letter-spacing: 2px; color: #9E8B70; text-transform: uppercase; font-family: 'Jost', sans-serif; }
   .pl-gold-line { height: 1px; background: linear-gradient(90deg, transparent, #B8862A 20%, #E8C96A 50%, #B8862A 80%, transparent); }
-
-  /* ── Filter bar ── */
   .pl-filter-wrap { background: #fff; border-bottom: 1px solid #EDE4D8; padding: 14px 40px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; font-family: 'Jost', sans-serif; font-size: 12px; position: sticky; top: 90px; z-index: 20; }
   .pl-filter-group { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
   .pl-filter-select { border: 1px solid #D4C4B0; color: #4A3728; padding: 7px 14px; font-size: 11px; letter-spacing: 1px; cursor: pointer; font-family: 'Jost', sans-serif; background: #fff; outline: none; border-radius: 2px; transition: border-color .2s; }
@@ -44,27 +43,19 @@ const listingStyles = `
   .pl-price-input { border: 1px solid #D4C4B0; padding: 6px 10px; font-size: 11px; color: #4A3728; width: 80px; outline: none; font-family: 'Jost', sans-serif; border-radius: 2px; transition: border-color .2s; }
   .pl-price-input:focus { border-color: #B8862A; }
   .pl-price-input.dirty { border-color: #B8862A; background: #FFFBF5; }
-
-  /* Clear filters button */
   .pl-clear-btn { display: flex; align-items: center; gap: 5px; border: 1px solid #E8C96A; color: #B8862A; padding: 5px 12px; font-size: 11px; letter-spacing: 1px; background: transparent; cursor: pointer; border-radius: 2px; font-family: 'Jost', sans-serif; transition: all .2s; white-space: nowrap; }
   .pl-clear-btn:hover { background: #2C1A0E; color: #D4AF6A; border-color: #2C1A0E; }
-
-  /* ── Grid & states ── */
   .pl-container { max-width: 1400px; margin: 0 auto; padding: 32px 40px 0; }
   .pl-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
   .pl-loader { display: flex; justify-content: center; align-items: center; min-height: 300px; color: #9E8875; }
   .pl-empty { text-align: center; padding: 80px 20px; background: #fff; border-radius: 4px; }
   .pl-empty-title { font-family: 'Cormorant Garamond', serif; font-size: 28px; color: #2C1A0E; margin-bottom: 6px; }
   .pl-empty-sub { font-size: 13px; color: #9E8875; }
-
-  /* ── Pagination ── */
   .pl-pagination { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 48px; }
   .pl-page-btn { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border: 1px solid #E8DDD0; background: #fff; cursor: pointer; font-size: 13px; color: #4A3728; border-radius: 2px; transition: all .2s; font-family: 'Jost', sans-serif; }
   .pl-page-btn:hover:not(:disabled) { border-color: #B8862A; color: #B8862A; }
   .pl-page-btn.active { background: #2C1A0E; border-color: #2C1A0E; color: #D4AF6A; }
   .pl-page-btn:disabled { opacity: .4; cursor: not-allowed; }
-
-  /* ── Responsive ── */
   @media (max-width: 1100px) { .pl-grid { grid-template-columns: repeat(3,1fr); } }
   @media (max-width: 768px) {
     .pl-grid { grid-template-columns: repeat(2,1fr); gap: 14px; }
@@ -75,7 +66,6 @@ const listingStyles = `
   }
 `;
 
-// ── Helper: convert URLSearchParams → filters object ────────────────────────
 function searchParamsToFilters(searchParams) {
   const filters = {};
   const keys = ["category", "metal.purity", "sort", "minPrice", "maxPrice"];
@@ -86,7 +76,6 @@ function searchParamsToFilters(searchParams) {
   return filters;
 }
 
-// ── Helper: build URLSearchParams from filters + page ───────────────────────
 function buildSearchParams(filters, page) {
   const params = new URLSearchParams();
   Object.entries(filters).forEach(([key, val]) => {
@@ -98,14 +87,12 @@ function buildSearchParams(filters, page) {
   return params;
 }
 
-// ── Price filter with debounce + Enter key support ──────────────────────────
 function PriceFilter({ initialMin = "", initialMax = "", onApply }) {
   const [min, setMin] = useState(initialMin);
   const [max, setMax] = useState(initialMax);
   const debounceRef   = useRef(null);
   const isDirty       = min !== "" || max !== "";
 
-  // Sync if URL changes externally (e.g. back/forward nav)
   useEffect(() => { setMin(initialMin); }, [initialMin]);
   useEffect(() => { setMax(initialMax); }, [initialMax]);
 
@@ -165,13 +152,12 @@ function PriceFilter({ initialMin = "", initialMax = "", onApply }) {
   );
 }
 
-// ── Main page ────────────────────────────────────────────────────────────────
-export default function ProductListing() {
+// ── Inner component: contains all useSearchParams logic ──────────────────────
+function ProductListingInner() {
   const router       = useRouter();
   const pathname     = usePathname();
   const searchParams = useSearchParams();
 
-  // ── 1. Read initial state from URL on first render ──
   const initialFilters = searchParamsToFilters(searchParams);
   const initialPage    = Number(searchParams.get("page")) || 1;
 
@@ -181,11 +167,9 @@ export default function ProductListing() {
   } = useProducts({ ...initialFilters, page: initialPage });
   const { toasts, showToast } = useToast();
 
-  // ── 2. Whenever filters or page change → push to URL ──
-  // isUpdatingUrl ref: marks that WE triggered the URL change,
-  // so Effect 3 doesn't echo it back as a state update (breaks the loop).
   const isFirstRender  = useRef(true);
   const isUpdatingUrl  = useRef(false);
+
   useEffect(() => {
     if (isFirstRender.current) { isFirstRender.current = false; return; }
     const params = buildSearchParams(filters, page);
@@ -194,11 +178,9 @@ export default function ProductListing() {
     router.replace(`${pathname}${query ? `?${query}` : ""}`, { scroll: false });
   }, [filters, page]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── 3. Handle browser back/forward → sync state from URL ──
-  // Only runs when URL was changed externally (back/forward), not by us.
   useEffect(() => {
     if (isUpdatingUrl.current) {
-      isUpdatingUrl.current = false; // consume the flag, skip this run
+      isUpdatingUrl.current = false;
       return;
     }
     const fromUrl     = searchParamsToFilters(searchParams);
@@ -238,7 +220,6 @@ export default function ProductListing() {
       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
       <Toast toasts={toasts} />
       <div className="pl-root">
-        {/* Hero */}
         <div className="pl-hero">
           <div className="pl-hero-content">
             <p className="pl-breadcrumb">
@@ -255,9 +236,7 @@ export default function ProductListing() {
         </div>
         <div className="pl-gold-line" />
 
-        {/* ── Filter Bar ── */}
         <div className="pl-filter-wrap">
-          {/* Category chips */}
           <div className="pl-filter-group">
             <button
               className={`pl-filter-chip${!activeCategory ? " active" : ""}`}
@@ -276,9 +255,7 @@ export default function ProductListing() {
             ))}
           </div>
 
-          {/* Right controls */}
           <div className="pl-right-bar">
-            {/* Purity — controlled */}
             <select
               className="pl-filter-select"
               value={activePurity}
@@ -288,14 +265,12 @@ export default function ProductListing() {
               {PURITIES.map(p => <option key={p} value={p}>{p}</option>)}
             </select>
 
-            {/* Price — debounced + Enter, synced with URL */}
             <PriceFilter
               initialMin={filters.minPrice || ""}
               initialMax={filters.maxPrice || ""}
               onApply={handlePriceApply}
             />
 
-            {/* Sort — controlled */}
             <div className="pl-sort">
               <select value={activeSort} onChange={handleSort}>
                 {SORT_OPTIONS.map(o => (
@@ -306,7 +281,6 @@ export default function ProductListing() {
 
             <span className="pl-count">{total} products</span>
 
-            {/* Clear all — only visible when filters are active */}
             {hasActiveFilters && (
               <button className="pl-clear-btn" onClick={clearAllFilters}>
                 <X size={12} /> Clear
@@ -315,7 +289,6 @@ export default function ProductListing() {
           </div>
         </div>
 
-        {/* ── Product Grid ── */}
         <div className="pl-container">
           {loading ? (
             <div className="pl-loader">
@@ -346,7 +319,6 @@ export default function ProductListing() {
             </div>
           )}
 
-          {/* ── Pagination ── */}
           {pages > 1 && (
             <div className="pl-pagination">
               <button
@@ -385,5 +357,22 @@ export default function ProductListing() {
         </div>
       </div>
     </>
+  );
+}
+
+// ── Default export: Suspense boundary wrapping the inner component ─────────────
+export default function ProductListing() {
+  return (
+    <Suspense fallback={
+      <div style={{
+        display: "flex", justifyContent: "center",
+        alignItems: "center", minHeight: "60vh", color: "#9E8875"
+      }}>
+        <Loader2 size={28} style={{ animation: "spin 1s linear infinite" }} />
+        <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+      </div>
+    }>
+      <ProductListingInner />
+    </Suspense>
   );
 }
