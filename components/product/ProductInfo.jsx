@@ -3,6 +3,8 @@ import { FaHeart, FaShareAlt, FaRegCopy, FaCheck } from "react-icons/fa";
 import ActionButtons from "./ActionButtons";
 import { useState } from "react";
 import api from "@/lib/api";
+import { Toast } from "@/components/common/Toast";
+import { useProducts, useToast, useCart } from "../../hooks";
 
 const infoStyles = `
   @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Jost:wght@300;400;500&display=swap');
@@ -36,6 +38,9 @@ const ProductInfo = ({ product }) => {
   const { name, sku, description, metal, price, variants } = product;
   const [copied, setCopied] = useState(false);
   const [wishlisted, setWishlisted] = useState(false);
+  const { addItem } = useCart();
+  const { toasts, showToast } = useToast();
+
 
   const handleCopy = () => {
     navigator.clipboard?.writeText("JTXYA20-AENC014");
@@ -44,22 +49,29 @@ const ProductInfo = ({ product }) => {
   };
 
 
-  const addToCart = () => {
-    // Api call to add item to cart
-    api.cart
-      .add(product._id, 1)
-      .then(() => {
-        alert("Item added to cart!");
-      })
-      .catch((err) => {
-        console.error("Error adding to cart:", err);
-        alert("Failed to add item to cart. Please try again.");
-      });
-  };
+     const addToCart = async (e) => {
+
+      const token = localStorage.getItem("manas_token");
+
+      if (!token) {
+        alert("Login required");
+        return;
+      }
+
+      try {
+        await addItem(product._id, 1);
+        showToast?.("Added to cart");
+      } catch (err) {
+        console.error(err);
+        showToast?.("Failed to add to cart", "error");
+      } finally {
+      }
+    };
 
   return (
     <>
       <style>{infoStyles}</style>
+            <Toast toasts={toasts} />
       <div className="pi-root">
         <p className="pi-breadcrumb">
           Home / Jewellery / Necklaces / Aakarshan Gold Necklace

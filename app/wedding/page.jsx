@@ -421,6 +421,20 @@ const S = `
 .wb-empty-icon{font-size:48px;margin-bottom:16px;}
 .wb-empty-title{font-family:'Cormorant Garamond',serif;font-size:30px;color:#2C1A0E;margin-bottom:8px;}
 .wb-empty-sub{font-size:13px;color:#9E8875;}
+
+
+  /* ── Filter bar wrapper ── */
+  .ls-filters { background: #fff; border-bottom: 1px solid #E8DDD0; position: sticky; top: 99px; z-index: 20; }
+
+   /* ── Shared pill style ── */
+  .ls-cat-pill { flex-shrink: 0; border: 1px solid #E8DDD0; background: none; padding: 6px 14px; font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 400; color: #5A4535; cursor: pointer; border-radius: 20px; transition: all .18s; white-space: nowrap; }
+  .ls-cat-pill:hover { border-color: #B8862A; color: #B8862A; }
+  .ls-cat-pill.active { background: #2C1A0E; border-color: #2C1A0E; color: #D4AF6A; font-weight: 500; }
+   
+    /* ══ DESKTOP bar — single scrollable row ══ */
+  .ls-desktop-bar { display: flex; align-items: center; gap: 8px; padding: 10px 24px; overflow-x: auto; scrollbar-width: none; }
+  .ls-desktop-bar::-webkit-scrollbar { display: none; }
+
 @keyframes wbsk{0%{background-position:-800px 0}100%{background-position:800px 0}}
 @keyframes wb-toast-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 .wb-spin{animation:wb-spin-a .8s linear infinite;}@keyframes wb-spin-a{to{transform:rotate(360deg)}}
@@ -428,6 +442,12 @@ const S = `
 @media(max-width:1000px){.wb-featured{grid-template-columns:1fr;}.wb-featured-main-img{min-height:320px;}.wb-featured-body{padding:32px 28px;}.wb-journey-track{flex-wrap:wrap;gap:28px;}.wb-journey-track::before{display:none;}.wb-journey-step{flex:0 0 calc(33.333% - 19px);}}
 @media(max-width:768px){.wb-section{padding:52px 20px;}.wb-grid{grid-template-columns:repeat(2,1fr);gap:14px;}.wb-hero-content{padding:0 24px;}.wb-hero-dots{left:50%;transform:translateX(-50%);}.wb-hero-scroll,.wb-hero-arrow{display:none;}.wb-filter-btn{padding:14px 18px;}.wb-testi-grid{grid-template-columns:1fr 1fr;}.wb-testi-inner,.wb-journey-inner{padding:0 20px;}.wb-journey-step{flex:0 0 calc(50% - 14px);}.wb-cta{padding:64px 20px;}}
 @media(max-width:560px){.wb-testi-grid{grid-template-columns:1fr;}.wb-grid{grid-template-columns:1fr;}.wb-journey-step{flex:0 0 100%;}}
+ @media (max-width: 768px) {
+    
+    .ls-filters { top: 115px; }
+
+  
+  }
 `;
 
 /* ════════════════════════════════════════
@@ -588,7 +608,7 @@ export default function WeddingPage() {
         <div className="wb-gold-line"/>
 
         {/* ══ FILTER ══ */}
-        <div className="wb-filter-strip" id="collections">
+        {/* <div className="wb-filter-strip" id="collections">
           <div className="wb-filter-inner">
             {occasions.map(occ => (
               <button key={occ.id} className={`wb-filter-btn${activeFilter===occ.id?" active":""}`}
@@ -598,7 +618,22 @@ export default function WeddingPage() {
               </button>
             ))}
           </div>
+        </div> */}
+
+<div className="ls-filters">
+
+
+         <div className="ls-desktop-bar">
+            {occasions.map(occ => (
+              <button
+                key={occ.id}
+                className={`ls-cat-pill${activeFilter === occ.id ? " active" : ""}`}
+                 onClick={() => setActiveFilter(occ.id)}
+              >{occ.label}s</button>
+            ))}
+                   
         </div>
+</div>
 
         {/* ══ COLLECTIONS ══ */}
         <div className="wb-section">

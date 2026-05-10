@@ -70,7 +70,7 @@ const cardStyles = `
 const ProductCard = ({ product, showToast  }) => {
   const { title, price, imgUrl, id , occasion} = product;
   const [wishlisted, setWishlisted] = useState(false);
-   const { addItem } = useCart();
+  const { addItem } = useCart();
 
 
     const handleAddToCart = async (e) => {
@@ -122,18 +122,18 @@ const ProductCard = ({ product, showToast  }) => {
       <Link className="pc-card" href={`/product/${product.slug}`}>
         <div className="pc-img-wrap">
           <img
-            src={`https://picsum.photos/400/400?random=${Math.floor(Math.random() * 1000)}`}
+            src={product.imgUrl ?? ''}
             className="pc-img"
             alt={title}
           />
           <div className="pc-badge-wrap">
             <span className="pc-badge">{occasion[0]}</span>
-            {occasion.length > 1 && (
+            {/* {occasion.length > 1 && (
               <span className="pc-badge more">+{occasion.length - 1}</span>
             )}
             {occasion.length > 1 && (
               <span className="pc-tooltip">{occasion.join(" · ")}</span>
-            )}
+            )} */}
           </div>
           <button
             className={`pc-wish${wishlisted ? " active" : ""}`}

@@ -1,7 +1,10 @@
 "use client";
 import { ShoppingBag, MapPin, Phone } from "lucide-react";
+import { useRouter } from "next/navigation";
 
-const ActionButtons = ({ addToCart }) => (
+const ActionButtons = ({ addToCart }) => {
+  const router = useRouter();
+  return (
   <>
     <style>{`
       @import url('https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&display=swap');
@@ -17,11 +20,11 @@ const ActionButtons = ({ addToCart }) => (
         <ShoppingBag size={15} /> Add to Cart
       </button>
       <div className="ab-btn-row">
-        <button className="ab-btn-outline"><MapPin size={13} /> Find Store</button>
-        <button className="ab-btn-outline"><Phone size={13} /> Call Us</button>
+        <button className="ab-btn-outline"  onClick={() => router.push("/contact")}><MapPin size={13} /> Find Store</button>
+        <button className="ab-btn-outline"  onClick={() => router.push("/contact")}><Phone size={13} /> Call Us</button>
       </div>
     </div>
-  </>
-);
+  </>)
+}
 
 export default ActionButtons;
