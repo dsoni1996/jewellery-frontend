@@ -387,7 +387,7 @@ export default function Navbar() {
         </div>
       )}
 
-      <MobileSidebar isOpen={isOpen} setIsOpen={setIsOpen} navData={navData} />
+      <MobileSidebar isOpen={isOpen} setIsOpen={setIsOpen} navData={navData} setOpenModel={setOpenModel}/>
       {openModel && <SignupModal onClose={() => setOpenModel(false)} />}
     </>
   );

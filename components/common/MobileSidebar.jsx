@@ -106,11 +106,11 @@ const S = `
   .msb-footer { padding:12px 20px; border-top:1px solid #E8DDD0; font-size:11px; color:#9E8875; display:flex; align-items:center; gap:6px; flex-shrink:0; }
 `;
 
-export default function MobileSidebar({ isOpen, setIsOpen, navData = null }) {
+export default function MobileSidebar({ isOpen, setIsOpen, navData = null, setOpenModel }) {
   const [openIndex, setOpenIndex] = useState(null);
   const [query,     setQuery]     = useState("");
   const router = useRouter();
-  const { cartCount } = useAuth();
+  const { cartCount, isLoggedIn  } = useAuth();
 
   /* Use API data if provided, else fallback to static */
   const dynamicNavItems = navData?.navItems || menuItems;
@@ -225,6 +225,17 @@ export default function MobileSidebar({ isOpen, setIsOpen, navData = null }) {
               : <span>Cart</span>
             }
           </Link>
+           <button
+    className="msb-action-btn"
+    onClick={() => {
+  close();
+  if (isLoggedIn) router.push("/account");
+  else setOpenModel(true);
+}}
+  >
+    <User size={18} />
+    <span>Account</span>
+  </button>
           <Link href="/search" className="msb-action-btn" onClick={close}>
             <Search size={18} />
             Search

@@ -16,7 +16,6 @@ const S = `
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 .ac-root{background:#FAF6F0;min-height:100vh;font-family:'Jost',sans-serif;padding:52px 0 80px;}
 .ac-inner{max-width:1100px;margin:0 auto;padding:0 40px;}
-@media(max-width:768px){.ac-inner{padding:0 16px;}.ac-layout{grid-template-columns:1fr!important;}}
 
 .ac-hero{margin-bottom:32px;}
 .ac-page-title{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:400;color:#2C1A0E;margin-bottom:4px;}
@@ -34,13 +33,15 @@ const S = `
 .ac-user-name{font-size:14px;font-weight:500;color:#FFFDF9;margin-bottom:2px;position:relative;z-index:1;}
 .ac-user-phone{font-size:11px;color:#7A6352;letter-spacing:.5px;position:relative;z-index:1;}
 .ac-gold-strip{height:2px;background:linear-gradient(90deg,transparent,#B8862A 30%,#E8C96A 50%,#B8862A 70%,transparent);}
+
+/* Nav — desktop */
 .ac-nav{padding:6px 0;}
-.ac-nav-item{display:flex;align-items:center;gap:11px;padding:12px 20px;font-size:12.5px;color:#5A4535;cursor:pointer;border:none;border-bottom:1px solid #F5EDE3;transition:all .15s;text-decoration:none;letter-spacing:.3px;width:100%;background:none;outline:none;}
+.ac-nav-item{display:flex;align-items:center;gap:11px;padding:12px 20px;font-size:12.5px;color:#5A4535;cursor:pointer;border:none;border-bottom:1px solid #F5EDE3;transition:all .15s;text-decoration:none;letter-spacing:.3px;width:100%;background:none;outline:none;font-family:'Jost',sans-serif;}
 .ac-nav-item:last-of-type{border-bottom:none;}
 .ac-nav-item:hover{background:#FBF6EE;color:#B8862A;}
 .ac-nav-item.active{background:#FBF6EE;color:#B8862A;font-weight:500;}
-.ac-nav-item.danger{color:#993C1D}
-.ac-nav-item.danger:hover{background:#FAECE7;border-color:#F5EDE3;}
+.ac-nav-item.danger{color:#993C1D;}
+.ac-nav-item.danger:hover{background:#FAECE7;}
 .ac-nav-badge{margin-left:auto;background:#2C1A0E;color:#D4AF6A;font-size:9px;padding:2px 7px;border-radius:10px;font-weight:600;}
 
 /* ── Cards ── */
@@ -50,10 +51,9 @@ const S = `
 .ac-card-title em{font-style:italic;color:#B8862A;}
 .ac-card-body{padding:22px;}
 
-/* ── Form elements ── */
+/* ── Form ── */
 .ac-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;}
 .ac-form-grid.full{grid-template-columns:1fr;}
-@media(max-width:600px){.ac-form-grid{grid-template-columns:1fr;}}
 .ac-field{display:flex;flex-direction:column;gap:5px;}
 .ac-label{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#9E8875;}
 .ac-input{border:1px solid #E8DDD0;padding:10px 13px;font-size:13px;color:#2C1A0E;font-family:'Jost',sans-serif;outline:none;border-radius:2px;transition:border-color .2s;background:#FFFDF9;width:100%;}
@@ -69,16 +69,14 @@ const S = `
 .ac-btn-danger{display:inline-flex;align-items:center;gap:6px;background:none;border:1px solid rgba(153,60,29,.2);color:#993C1D;padding:8px 14px;font-family:'Jost',sans-serif;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:all .2s;}
 .ac-btn-danger:hover{background:#FAECE7;border-color:#993C1D;}
 
-/* ── Stats strip ── */
+/* ── Stats ── */
 .ac-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;}
-@media(max-width:600px){.ac-stats{grid-template-columns:1fr 1fr;}}
 .ac-stat{background:#FBF6EE;border:1px solid #E8D8C0;border-radius:3px;padding:14px 16px;text-align:center;}
 .ac-stat-num{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;color:#2C1A0E;}
 .ac-stat-label{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#9E8875;margin-top:3px;}
 
-/* ── Address cards ── */
+/* ── Address ── */
 .ac-addr-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-@media(max-width:600px){.ac-addr-grid{grid-template-columns:1fr;}}
 .ac-addr-card{border:1px solid #E8DDD0;border-radius:3px;padding:16px;position:relative;background:#FFFDF9;transition:border-color .2s;}
 .ac-addr-card.default{border-color:#B8862A;}
 .ac-addr-card-label{font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B8862A;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
@@ -88,11 +86,10 @@ const S = `
 .ac-addr-actions{display:flex;gap:8px;margin-top:12px;}
 .ac-addr-add{border:1px dashed #D4C4B0;border-radius:3px;padding:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:all .2s;background:none;width:100%;font-family:'Jost',sans-serif;}
 .ac-addr-add:hover{border-color:#B8862A;background:#FBF6EE;}
-.ac-addr-add-icon{width:36px;height:36px;border-radius:50%;background:#FBF6EE;border:1px solid #E8D8C0;display:flex;align-items:center;justify-content:center;color:#B8862A;transition:background .2s;}
-.ac-addr-add:hover .ac-addr-add-icon{background:#fff;}
+.ac-addr-add-icon{width:36px;height:36px;border-radius:50%;background:#FBF6EE;border:1px solid #E8D8C0;display:flex;align-items:center;justify-content:center;color:#B8862A;}
 .ac-addr-add-text{font-size:12px;color:#9E8875;letter-spacing:.5px;}
 
-/* ── Order rows ── */
+/* ── Orders ── */
 .ac-order-row{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid #F5EDE3;}
 .ac-order-row:last-child{border-bottom:none;}
 .ac-order-img{width:52px;height:52px;object-fit:cover;border-radius:2px;background:#F5EDE3;flex-shrink:0;}
@@ -108,7 +105,7 @@ const S = `
 .ac-status.processing,.ac-status.confirmed{background:#FAEEDA;color:#854F0B;}
 .ac-status.cancelled{background:#FAECE7;color:#993C1D;}
 
-/* ── Address modal ── */
+/* ── Modal ── */
 .ac-modal-overlay{position:fixed;inset:0;background:rgba(20,10,5,.52);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px);}
 .ac-modal{background:#FFFDF9;border-radius:4px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(20,10,5,.25);}
 .ac-modal-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid #E8DDD0;position:sticky;top:0;background:#FFFDF9;z-index:1;}
@@ -124,6 +121,79 @@ const S = `
 @keyframes ac-toast-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 .ac-spin{animation:spin .8s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* ════════════════════════════════
+   MOBILE OVERRIDES  (768px)
+════════════════════════════════ */
+@media(max-width:768px){
+  .ac-root{padding:20px 0 60px;}
+  .ac-inner{padding:0 16px;}
+  .ac-hero{margin-bottom:16px;}
+  .ac-page-title{font-size:28px;}
+  .ac-gold-line{margin-bottom:20px;}
+
+  /* Layout — sidebar above, content below */
+  .ac-layout{display:block;}
+  .ac-sidebar{position:static;margin-bottom:16px;border-radius:8px;}
+
+  /* User head — horizontal on mobile */
+  .ac-user-head{display:flex;align-items:center;gap:14px;padding:16px;}
+  .ac-avatar{margin-bottom:0;width:44px;height:44px;font-size:17px;flex-shrink:0;}
+
+  /* Nav — horizontal scrollable pill row */
+  .ac-gold-strip{display:none;}
+  .ac-nav{
+    display:flex;
+    flex-direction:row;
+    overflow-x:auto;
+    padding:10px 12px;
+    gap:8px;
+    border-top:1px solid #E8DDD0;
+  }
+  .ac-nav::-webkit-scrollbar{display:none;}
+
+  /* Override all desktop nav-item styles */
+  .ac-nav-item{
+    flex-shrink:0;
+    width:auto !important;
+    padding:7px 14px !important;
+    border:1px solid #E8DDD0 !important;
+    border-bottom:1px solid #E8DDD0 !important;
+    border-radius:20px !important;
+    font-size:11px !important;
+    letter-spacing:0.8px;
+    white-space:nowrap;
+    background:#FFFDF9 !important;
+    color:#5A4535 !important;
+  }
+  .ac-nav-item:last-of-type{border-bottom:1px solid #E8DDD0 !important;}
+  .ac-nav-item.active{background:#2C1A0E !important;color:#D4AF6A !important;border-color:#2C1A0E !important;}
+  .ac-nav-item.danger{color:#993C1D !important;border-color:rgba(153,60,29,.3) !important;background:#FFFDF9 !important;}
+  .ac-nav-item svg{display:none;}
+  .ac-nav-badge{margin-left:6px;}
+
+  /* Cards */
+  .ac-card-body{padding:16px;}
+  .ac-card-head{padding:14px 16px;}
+
+  /* Stats — keep 3 cols but smaller padding */
+  .ac-stat{padding:10px 8px;}
+  .ac-stat-num{font-size:24px;}
+
+  /* Forms — single column */
+  .ac-form-grid{grid-template-columns:1fr;}
+
+  /* Address grid — single column */
+  .ac-addr-grid{grid-template-columns:1fr;}
+
+  /* Orders — price below on very small screens */
+  .ac-order-num{font-size:11px;}
+  .ac-order-price{font-size:16px;}
+
+  /* Modal full-screen on mobile */
+  .ac-modal-overlay{padding:0;align-items:flex-end;}
+  .ac-modal{max-width:100%;max-height:92vh;border-radius:12px 12px 0 0;}
+}
 `;
 
 const TABS = [
