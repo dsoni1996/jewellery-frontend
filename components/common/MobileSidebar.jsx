@@ -113,8 +113,8 @@ export default function MobileSidebar({ isOpen, setIsOpen, navData = null, setOp
   const { cartCount, isLoggedIn  } = useAuth();
 
   /* Use API data if provided, else fallback to static */
-  const dynamicNavItems = navData?.navItems || menuItems;
-  const dynamicMegaCols = navData?.megaCols || megaCols;
+const dynamicNavItems = navData?.navItems || menuItems;
+  // const dynamicMegaCols = navData?.megaCols || megaCols;
 
   const close = () => setIsOpen(false);
 
@@ -135,8 +135,12 @@ export default function MobileSidebar({ isOpen, setIsOpen, navData = null, setOp
       <div className={`msb-drawer${isOpen ? " open" : ""}`}>
         {/* Header */}
         <div className="msb-header">
-          <Link href="/" className="msb-logo" onClick={close}>MAN<span>A</span>S</Link>
-          <button className="msb-close" onClick={close}><X size={20} /></button>
+          <Link href="/" className="msb-logo" onClick={close}>
+            MAN<span>A</span>S
+          </Link>
+          <button className="msb-close" onClick={close}>
+            <X size={20} />
+          </button>
         </div>
         <div className="msb-gold-line" />
 
@@ -147,7 +151,7 @@ export default function MobileSidebar({ isOpen, setIsOpen, navData = null, setOp
             className="msb-search-input"
             placeholder="Search jewellery…"
             value={query}
-            onChange={e => setQuery(e.target.value)}
+            onChange={(e) => setQuery(e.target.value)}
           />
           <button type="submit" className="msb-search-btn">
             <Search size={14} />
@@ -182,29 +186,44 @@ export default function MobileSidebar({ isOpen, setIsOpen, navData = null, setOp
               )}
 
               {/* Mega accordion content — supports both API {label,href} and legacy string items */}
+
               {item.hasMegaMenu && (
-                <div className={`msb-dropdown${openIndex === idx ? " open" : ""}`}>
+                <div
+                  className={`msb-dropdown${openIndex === idx ? " open" : ""}`}
+                >
                   <div className="msb-dropdown-inner">
-                    {dynamicMegaCols.map((col, ci) => (
-                      <div key={col._id || ci}>
-                        {col.title && <p className="msb-col-title">{col.title}</p>}
-                        {col.items.map((sub, si) => {
-                          const isLastHighlight = col.highlightLast && si === col.items.length - 1;
-                          const label = typeof sub === "string" ? sub : sub.label;
-                          const href  = typeof sub === "string" ? (col.map?.[sub] || "/listing") : (sub.href || "/listing");
-                          return (
-                            <Link
-                              key={si}
-                              href={href}
-                              className={`msb-sub-item${isLastHighlight ? " highlight" : ""}`}
-                              onClick={close}
-                            >
-                              {label}
-                            </Link>
-                          );
-                        })}
-                      </div>
-                    ))}
+                    {(item.megaCols || []).map(
+                      (
+                        col,
+                        ci, // ← item.megaCols
+                      ) => (
+                        <div key={col._id || ci}>
+                          {col.title && (
+                            <p className="msb-col-title">{col.title}</p>
+                          )}
+                          {col.items.map((sub, si) => {
+                            const isLastHighlight =
+                              col.highlightLast && si === col.items.length - 1;
+                            const label =
+                              typeof sub === "string" ? sub : sub.label;
+                            const href =
+                              typeof sub === "string"
+                                ? col.map?.[sub] || "/listing"
+                                : sub.href || "/listing";
+                            return (
+                              <Link
+                                key={si}
+                                href={href}
+                                className={`msb-sub-item${isLastHighlight ? " highlight" : ""}`}
+                                onClick={close}
+                              >
+                                {label}
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      ),
+                    )}
                   </div>
                 </div>
               )}
@@ -220,22 +239,23 @@ export default function MobileSidebar({ isOpen, setIsOpen, navData = null, setOp
           </Link>
           <Link href="/cart" className="msb-action-btn" onClick={close}>
             <ShoppingBag size={18} />
-            {cartCount > 0
-              ? <span className="msb-action-badge">{cartCount}</span>
-              : <span>Cart</span>
-            }
+            {cartCount > 0 ? (
+              <span className="msb-action-badge">{cartCount}</span>
+            ) : (
+              <span>Cart</span>
+            )}
           </Link>
-           <button
-    className="msb-action-btn"
-    onClick={() => {
-  close();
-  if (isLoggedIn) router.push("/account");
-  else setOpenModel(true);
-}}
-  >
-    <User size={18} />
-    <span>Account</span>
-  </button>
+          <button
+            className="msb-action-btn"
+            onClick={() => {
+              close();
+              if (isLoggedIn) router.push("/account");
+              else setOpenModel(true);
+            }}
+          >
+            <User size={18} />
+            <span>Account</span>
+          </button>
           <Link href="/search" className="msb-action-btn" onClick={close}>
             <Search size={18} />
             Search

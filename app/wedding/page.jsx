@@ -220,7 +220,9 @@ function FeaturedCard({ set, wishlisted, onWish, onAddCart, addingId }) {
 function SetCard({ set, wishlisted, onWish, onAddCart, addingId }) {
   const isAdding = addingId===(set.id||set._id);
   return (
-    <div className="wb-card">
+     <Link className="wb-card" href={`/product/${set.slug}`}>
+
+  
       <div className="wb-card-img-wrap">
         <img src={set.img} alt={set.name} className="wb-card-img"/>
         {set.badge && <span className="wb-card-badge">{set.badge}</span>}
@@ -257,7 +259,8 @@ function SetCard({ set, wishlisted, onWish, onAddCart, addingId }) {
           </Link>
         )}
       </div>
-    </div>
+    
+     </Link>
   );
 }
 
@@ -350,7 +353,7 @@ const S = `
 .wb-btn-wish{background:none;border:1px solid #E8DDD0;padding:15px 18px;cursor:pointer;color:#9E8875;transition:all .2s;display:flex;align-items:center;}
 .wb-btn-wish:hover{border-color:#B8862A;color:#B8862A;}.wb-btn-wish.active{color:#c0392b;border-color:rgba(192,57,43,.35);}
 .wb-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
-.wb-card{background:#fff;border:1px solid #EDE4D8;overflow:hidden;transition:box-shadow .35s,transform .35s,border-color .35s;cursor:pointer;position:relative;}
+.wb-card{background:#fff;border:1px solid #EDE4D8;overflow:hidden;transition:box-shadow .35s,transform .35s,border-color .35s;cursor:pointer;position:relative; text-decoration: none;}
 .wb-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#D4AF6A,transparent);transform:scaleX(0);transition:transform .4s ease;z-index:2;pointer-events:none;}
 .wb-card:hover{box-shadow:0 16px 48px rgba(44,26,14,.12);transform:translateY(-5px);border-color:#D4C4A8;}.wb-card:hover::before{transform:scaleX(1);}
 .wb-card-img-wrap{position:relative;overflow:hidden;aspect-ratio:4/5;}

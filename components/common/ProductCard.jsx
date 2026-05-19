@@ -7,7 +7,8 @@ import { useCart } from "../../hooks";
 
 const cardStyles = `
   @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Jost:wght@300;400;500&display=swap');
-  .pc-card { position: relative; background: #fff; border-radius: 4px; overflow: hidden; cursor: pointer; transition: box-shadow 0.3s ease; font-family: 'Jost', sans-serif; border: 1px solid #EDE4D8; }
+  .pc-card * { text-decoration: none; }
+  .pc-card { position: relative; background: #fff; border-radius: 4px; overflow: hidden; cursor: pointer; transition: box-shadow 0.3s ease; font-family: 'Jost', sans-serif; border: 1px solid #EDE4D8; text-decoration: none; }
   .pc-card:hover { box-shadow: 0 8px 32px rgba(44,26,14,0.14); }
   .pc-img-wrap { position: relative; overflow: hidden; background: #F5EDE3; aspect-ratio: 1; }
   .pc-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; display: block; }
@@ -68,7 +69,7 @@ const cardStyles = `
 `;
 
 const ProductCard = ({ product, showToast  }) => {
-  const { title, price, imgUrl, id , occasion} = product;
+  const { title, price, imgUrl, id , occasion, badge} = product;
   const [wishlisted, setWishlisted] = useState(false);
   const { addItem } = useCart();
 
@@ -127,13 +128,8 @@ const ProductCard = ({ product, showToast  }) => {
             alt={title}
           />
           <div className="pc-badge-wrap">
-            <span className="pc-badge">{occasion[0]}</span>
-            {/* {occasion.length > 1 && (
-              <span className="pc-badge more">+{occasion.length - 1}</span>
-            )}
-            {occasion.length > 1 && (
-              <span className="pc-tooltip">{occasion.join(" · ")}</span>
-            )} */}
+           {/* { occasion.length > 0 && <span className="pc-badge">{occasion[0]}</span> } */}
+          { badge && <span className="pc-badge">{badge}</span> }
           </div>
           <button
             className={`pc-wish${wishlisted ? " active" : ""}`}

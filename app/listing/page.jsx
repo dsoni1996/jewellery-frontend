@@ -2,13 +2,21 @@
 import { useState, useEffect, useRef } from "react";
 import { Suspense } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { Loader2, SlidersHorizontal, X } from "lucide-react";
+import { Badge, Loader2, SlidersHorizontal, X } from "lucide-react";
 import ProductCard from "../../components/common/ProductCard";
 import { useProducts, useToast } from "../../hooks";
 import { Toast } from "@/components/common/Toast";
 
 const CATEGORIES = ["Ring","Necklace","Earring","Bangle","Bracelet","Mangalsutra","Pendant"];
 const PURITIES   = ["22KT","18KT","14KT"];
+const METALS = ["Gold", "Silver", "Platinum"];
+
+const PURITY_BY_MATERIAL = {
+  Gold: ["24KT", "22KT", "18KT", "14KT"],
+  Silver: ["999", "925"],
+  Platinum: ["950"],
+  Other: [],
+};
 
 const SORT_OPTIONS = [
   { value: "",           label: "Recommended" },
@@ -228,6 +236,7 @@ function ProductListingInner() {
 
   /* Drawer local state */
   const [drawerCat,  setDrawerCat]  = useState("");
+  const [drawerMetal, setDrawerMetal] = useState("Gold");
   const [drawerPur,  setDrawerPur]  = useState("");
   const [drawerSort, setDrawerSort] = useState("");
   const [drawerMin,  setDrawerMin]  = useState("");
@@ -235,7 +244,7 @@ function ProductListingInner() {
 
   function searchParamsToFilters(sp) {
     const f = {};
-    ["category","metal.purity","sort","minPrice","maxPrice"].forEach(k => {
+    ["category","metal","metal.purity","sort","minPrice","maxPrice"].forEach(k => {
       const v = sp.get(k); if (v) f[k] = v;
     });
     return f;
@@ -248,7 +257,10 @@ function ProductListingInner() {
     return p;
   }
 
-  const initialFilters = searchParamsToFilters(searchParams);
+  const initialFilters = {
+  metal: "Gold",
+  ...searchParamsToFilters(searchParams),
+};
   const initialPage    = Number(searchParams.get("page")) || 1;
 
   const { products, total, pages, page, loading, filters, setPage, setFilters, updateFilter } =
@@ -277,6 +289,9 @@ function ProductListingInner() {
   const activeCategory = filters.category        || "";
   const activePurity   = filters["metal.purity"] || "";
   const activeSort     = filters.sort            || "";
+  const activeMetal = filters.metal || "";
+  const activePurities =
+  PURITY_BY_MATERIAL[activeMetal || "Gold"] || [];
 
   const safeUpdateFilter = (key, value) => { setPage(1); updateFilter(key, value); };
   const handleSort       = (e) => safeUpdateFilter("sort", e.target.value);
@@ -289,6 +304,7 @@ function ProductListingInner() {
 
   const openDrawer = () => {
     setDrawerCat(activeCategory);
+    setDrawerMetal(activeMetal || "Gold");
     setDrawerPur(activePurity);
     setDrawerSort(activeSort);
     setDrawerMin(filters.minPrice || "");
@@ -299,6 +315,8 @@ function ProductListingInner() {
   const applyDrawer = () => {
     setPage(1);
     setFilters({
+       metal: "Gold",  
+      ...(drawerMetal ? { metal: drawerMetal }        : {}),
       ...(drawerCat  ? { category: drawerCat }          : {}),
       ...(drawerPur  ? { "metal.purity": drawerPur }    : {}),
       ...(drawerSort ? { sort: drawerSort }              : {}),
@@ -318,9 +336,18 @@ function ProductListingInner() {
         {/* Hero */}
         <div className="pl-hero">
           <div className="pl-hero-content">
-            <p className="pl-breadcrumb">Home &nbsp;/&nbsp; Jewellery{activeCategory && ` / ${activeCategory}s`}</p>
+            <p className="pl-breadcrumb">
+              Home &nbsp;/&nbsp; Jewellery
+              {activeCategory && ` / ${activeCategory}s`}
+            </p>
             <h1 className="pl-hero-title">
-              {activeCategory ? <em>{activeCategory}s</em> : <>Our <em>Collection</em></>}
+              {activeCategory ? (
+                <em>{activeCategory}s</em>
+              ) : (
+                <>
+                  Our <em>Collection</em>
+                </>
+              )}
             </h1>
             <p className="pl-hero-sub">{total} Exquisite Designs</p>
           </div>
@@ -329,28 +356,52 @@ function ProductListingInner() {
 
         {/* ══ FILTER BAR ══ */}
         <div className="ls-filters">
-
           {/* ── DESKTOP: single row ── */}
           <div className="ls-desktop-bar">
             <button
               className={`ls-cat-pill${!activeCategory ? " active" : ""}`}
               onClick={() => safeUpdateFilter("category", "")}
-            >All</button>
+            >
+              All
+            </button>
 
-            {CATEGORIES.map(c => (
+            {CATEGORIES.map((c) => (
               <button
                 key={c}
                 className={`ls-cat-pill${activeCategory === c ? " active" : ""}`}
                 onClick={() => safeUpdateFilter("category", c)}
-              >{c}s</button>
+              >
+                {c}s
+              </button>
             ))}
 
             <span className="ls-desktop-divider" />
 
-            <select className="ls-select" value={activePurity}
-              onChange={e => safeUpdateFilter("metal.purity", e.target.value)}>
+            <select
+              className="ls-select"
+              value={activePurity}
+              onChange={(e) => safeUpdateFilter("metal.purity", e.target.value)}
+            >
               <option value="">All Purity</option>
-              {PURITIES.map(p => <option key={p} value={p}>{p}</option>)}
+              {activePurities.map((p) => (
+                <option key={p} value={p}>
+                  {p}
+                </option>
+              ))}
+            </select>
+
+            <select
+              className="ls-select"
+              value={activeMetal}
+              onChange={(e) => safeUpdateFilter("metal", e.target.value)}
+            >
+              <option value="">All Metals</option>
+
+              {METALS.map((m) => (
+                <option key={m} value={m}>
+                  {m}
+                </option>
+              ))}
             </select>
 
             <PriceFilter
@@ -359,8 +410,16 @@ function ProductListingInner() {
               onApply={handlePriceApply}
             />
 
-            <select className="ls-select" value={activeSort} onChange={handleSort}>
-              {SORT_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+            <select
+              className="ls-select"
+              value={activeSort}
+              onChange={handleSort}
+            >
+              {SORT_OPTIONS.map((s) => (
+                <option key={s.value} value={s.value}>
+                  {s.label}
+                </option>
+              ))}
             </select>
 
             <span className="ls-result-tag">{total} products</span>
@@ -377,20 +436,32 @@ function ProductListingInner() {
             <button
               className={`ls-cat-pill${!activeCategory ? " active" : ""}`}
               onClick={() => safeUpdateFilter("category", "")}
-            >All</button>
-            {CATEGORIES.map(c => (
+            >
+              All
+            </button>
+            {CATEGORIES.map((c) => (
               <button
                 key={c}
                 className={`ls-cat-pill${activeCategory === c ? " active" : ""}`}
                 onClick={() => safeUpdateFilter("category", c)}
-              >{c}s</button>
+              >
+                {c}s
+              </button>
             ))}
           </div>
 
           {/* ── MOBILE Row 2: sort + count + filter btn ── */}
           <div className="ls-options-row">
-            <select className="ls-select" value={activeSort} onChange={handleSort}>
-              {SORT_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+            <select
+              className="ls-select"
+              value={activeSort}
+              onChange={handleSort}
+            >
+              {SORT_OPTIONS.map((s) => (
+                <option key={s.value} value={s.value}>
+                  {s.label}
+                </option>
+              ))}
             </select>
 
             <span className="ls-result-tag">{total} products</span>
@@ -418,7 +489,10 @@ function ProductListingInner() {
         <div className="pl-container">
           {loading ? (
             <div className="pl-loader">
-              <Loader2 size={28} style={{ animation: "spin 1s linear infinite" }} />
+              <Loader2
+                size={28}
+                style={{ animation: "spin 1s linear infinite" }}
+              />
             </div>
           ) : products.length === 0 ? (
             <div className="pl-empty">
@@ -427,18 +501,19 @@ function ProductListingInner() {
             </div>
           ) : (
             <div className="pl-grid">
-              {products.map(item => (
+              {products.map((item) => (
                 <ProductCard
                   key={item._id}
                   showToast={showToast}
                   product={{
-                    id:       item._id,
-                    slug:     item.slug,
-                    imgUrl:   item.thumbnail,
-                    title:    item.name,
-                    price:    item.price?.current,
-                    tag:      `${item.metal?.purity} ${item.category}`,
+                    id: item._id,
+                    slug: item.slug,
+                    imgUrl: item.thumbnail,
+                    title: item.name,
+                    price: item.price?.current,
+                    tag: `${item.metal?.purity} ${item.category}`,
                     occasion: item.occasion,
+                    badge: item.badge,
                   }}
                 />
               ))}
@@ -447,19 +522,37 @@ function ProductListingInner() {
 
           {pages > 1 && (
             <div className="pl-pagination">
-              <button className="pl-page-btn" disabled={page <= 1} onClick={() => setPage(p => p - 1)}>‹</button>
+              <button
+                className="pl-page-btn"
+                disabled={page <= 1}
+                onClick={() => setPage((p) => p - 1)}
+              >
+                ‹
+              </button>
               {Array.from({ length: pages }, (_, i) => i + 1)
-                .filter(p => p === 1 || p === pages || Math.abs(p - page) <= 1)
+                .filter(
+                  (p) => p === 1 || p === pages || Math.abs(p - page) <= 1,
+                )
                 .map((p, i, arr) => (
-                  <span key={p} style={{ display:"contents" }}>
-                    {i > 0 && arr[i-1] !== p-1 && <span style={{ color:"#B0A090", fontSize:13 }}>…</span>}
+                  <span key={p} style={{ display: "contents" }}>
+                    {i > 0 && arr[i - 1] !== p - 1 && (
+                      <span style={{ color: "#B0A090", fontSize: 13 }}>…</span>
+                    )}
                     <button
                       className={`pl-page-btn${p === page ? " active" : ""}`}
                       onClick={() => setPage(p)}
-                    >{p}</button>
+                    >
+                      {p}
+                    </button>
                   </span>
                 ))}
-              <button className="pl-page-btn" disabled={page >= pages} onClick={() => setPage(p => p + 1)}>›</button>
+              <button
+                className="pl-page-btn"
+                disabled={page >= pages}
+                onClick={() => setPage((p) => p + 1)}
+              >
+                ›
+              </button>
             </div>
           )}
         </div>
@@ -472,11 +565,17 @@ function ProductListingInner() {
           <div className="ls-drawer">
             <div className="ls-drawer-handle" />
             <div className="ls-drawer-head">
-              <p className="ls-drawer-title">Filter <em>Products</em></p>
-              <button className="ls-drawer-close" onClick={() => setShowDrawer(false)}><X size={18} /></button>
+              <p className="ls-drawer-title">
+                Filter <em>Products</em>
+              </p>
+              <button
+                className="ls-drawer-close"
+                onClick={() => setShowDrawer(false)}
+              >
+                <X size={18} />
+              </button>
             </div>
             <div className="ls-drawer-body">
-
               {/* Category */}
               <div>
                 <p className="ls-drawer-section-label">Category</p>
@@ -484,31 +583,57 @@ function ProductListingInner() {
                   <button
                     className={`ls-drawer-pill${drawerCat === "" ? " active" : ""}`}
                     onClick={() => setDrawerCat("")}
-                  >All</button>
-                  {CATEGORIES.map(cat => (
+                  >
+                    All
+                  </button>
+                  {CATEGORIES.map((cat) => (
                     <button
                       key={cat}
                       className={`ls-drawer-pill${drawerCat === cat ? " active" : ""}`}
                       onClick={() => setDrawerCat(cat)}
-                    >{cat}s</button>
+                    >
+                      {cat}s
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {/* Metal */}
+              <div>
+                <p className="ls-drawer-section-label">Metal</p>
+                <div className="ls-drawer-pills">
+                  {METALS.map((m) => (
+                    <button
+                      key={m}
+                      className={`ls-drawer-pill${drawerMetal === m ? " active" : ""}`}
+                      onClick={() => {
+                        setDrawerMetal(m);
+                        setDrawerPur(""); // purity reset on metal change
+                      }}
+                    >
+                      {m}
+                    </button>
                   ))}
                 </div>
               </div>
 
               {/* Purity */}
               <div>
-                <p className="ls-drawer-section-label">Gold Purity</p>
+                <p className="ls-drawer-section-label">Purity</p>
                 <div className="ls-drawer-pills">
                   <button
                     className={`ls-drawer-pill${drawerPur === "" ? " active" : ""}`}
                     onClick={() => setDrawerPur("")}
-                  >All</button>
-                  {PURITIES.map(p => (
+                  >
+                    All
+                  </button>
+                  {(PURITY_BY_MATERIAL[drawerMetal] || []).map((p) => (
                     <button
                       key={p}
                       className={`ls-drawer-pill${drawerPur === p ? " active" : ""}`}
                       onClick={() => setDrawerPur(p)}
-                    >{p}</button>
+                    >
+                      {p}
+                    </button>
                   ))}
                 </div>
               </div>
@@ -519,7 +644,10 @@ function ProductListingInner() {
                 <DrawerPriceFilter
                   initialMin={drawerMin}
                   initialMax={drawerMax}
-                  onChange={(mn, mx) => { setDrawerMin(mn); setDrawerMax(mx); }}
+                  onChange={(mn, mx) => {
+                    setDrawerMin(mn);
+                    setDrawerMax(mx);
+                  }}
                 />
               </div>
 
@@ -527,18 +655,21 @@ function ProductListingInner() {
               <div>
                 <p className="ls-drawer-section-label">Sort By</p>
                 <div className="ls-drawer-pills">
-                  {SORT_OPTIONS.filter(s => s.value !== "").map(s => (
+                  {SORT_OPTIONS.filter((s) => s.value !== "").map((s) => (
                     <button
                       key={s.value}
                       className={`ls-drawer-pill${drawerSort === s.value ? " active" : ""}`}
                       onClick={() => setDrawerSort(s.value)}
-                    >{s.label}</button>
+                    >
+                      {s.label}
+                    </button>
                   ))}
                 </div>
               </div>
 
               <button className="ls-drawer-apply" onClick={applyDrawer}>
-                Apply Filters {activeFilterCount > 0 ? `(${activeFilterCount})` : ""}
+                Apply Filters{" "}
+                {activeFilterCount > 0 ? `(${activeFilterCount})` : ""}
               </button>
             </div>
           </div>

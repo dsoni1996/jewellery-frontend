@@ -116,6 +116,9 @@ const S = `
 .ac-modal-body{padding:22px;}
 .ac-modal-foot{padding:14px 22px;border-top:1px solid #E8DDD0;display:flex;justify-content:flex-end;gap:10px;}
 
+/* ── Wishlist ── */
+.ac-wishlist-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+
 /* ── Toast ── */
 .ac-toast{position:fixed;bottom:28px;right:24px;background:#2C1A0E;color:#D4AF6A;padding:12px 22px;border-radius:3px;font-size:13px;display:flex;align-items:center;gap:8px;box-shadow:0 8px 32px rgba(0,0,0,.2);z-index:200;animation:ac-toast-in .25s ease;font-family:'Jost',sans-serif;}
 @keyframes ac-toast-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
@@ -193,6 +196,13 @@ const S = `
   /* Modal full-screen on mobile */
   .ac-modal-overlay{padding:0;align-items:flex-end;}
   .ac-modal{max-width:100%;max-height:92vh;border-radius:12px 12px 0 0;}
+
+  .ac-wishlist-grid{
+
+  grid-template-columns:1fr;
+  
+}
+
 }
 `;
 
@@ -579,10 +589,10 @@ export default function AccountPage() {
               {/* ─── WISHLIST TAB ─── */}
               {tab === "wishlist" && (
                 <div className="ac-card">
-                  <div className="ac-card-head">
+                    <div className="ac-card-head">
                     <span className="ac-card-title">My <em>Wishlist</em></span>
-                    <Link href="/wishlist" style={{ fontSize: 11, color: "#B8862A", letterSpacing: 1.5, textTransform: "uppercase", textDecoration: "none" }}>
-                      View All →
+                    <Link href="/wishlist" style={{ fontSize: 11, color: "#B8862A", letterSpacing: 1.5, textTransform: "uppercase", textDecoration: "none", display: "flex", alignItems: "center", gap: 5 }}>
+                      View All <ChevronRight size={12} />
                     </Link>
                   </div>
                   <div className="ac-card-body">
@@ -594,7 +604,7 @@ export default function AccountPage() {
                         <Link href="/listing" className="ac-btn-primary" style={{ textDecoration: "none" }}>Explore Jewellery</Link>
                       </div>
                     ) : (
-                      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14 }}>
+                      <div className="ac-wishlist-grid">
                         {wishlist.map(p => (
                           <Link key={p._id} href={`/product?slug=${p.slug}`} style={{ textDecoration: "none" }}>
                             <div style={{ border: "1px solid #EDE4D8", borderRadius: 3, overflow: "hidden", transition: "box-shadow .2s" }}>

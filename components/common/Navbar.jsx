@@ -224,10 +224,11 @@ export default function Navbar() {
 };
 
   /* ── Destructure live data ── */
-  const { topbar, navItems = [], megaCols = [], megaImgs = [], searchHints = [] } = navData;
+  // const { topbar, navItems = [], megaCols = [], megaImgs = [], searchHints = [] } = navData;
+  const { topbar, navItems = [], searchHints = [] } = navData;
 
   /* Build grid columns count: megaCols + 1 image col */
-  const gridCols = `repeat(${megaCols.length}, 1fr) 220px`;
+  // const gridCols = `repeat(${megaCols.length}, 1fr) 220px`;
 
   return (
     <>
@@ -258,46 +259,55 @@ export default function Navbar() {
                   </Link>
 
                   {/* Mega panel — columns from backend */}
-                  <div className="nb-mega">
-                    <div
-                      className="nb-mega-inner"
-                      style={{ gridTemplateColumns: gridCols }}
-                    >
-                      {megaCols.map((col) => (
-                        <div key={col._id}>
-                          {col.title && (
-                            <p className="nb-col-title">{col.title}</p>
-                          )}
-                          <ul>
-                            {col.items.map((itm, k) => (
-                              <li key={k}>
-                                <Link
-                                  href={itm.href || "/listing"}
-                                  className={`nb-mega-item${col.highlightLast && k === col.items.length - 1 ? " highlight" : ""}`}
-                                >
-                                  {itm.label}
-                                </Link>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      ))}
 
-                      {/* Featured images — from backend */}
-                      <div className="nb-mega-imgs">
-                        {megaImgs.map((img) => (
-                          <Link
-                            key={img._id}
-                            href={img.href || "/listing"}
-                            className="nb-mega-img-wrap"
-                          >
-                            <img src={img.src} alt={img.alt} />
-                            <span className="nb-mega-img-label">{img.alt}</span>
-                          </Link>
+                  {item.hasMegaMenu && (
+                    <div className="nb-mega">
+                      <div
+                        className="nb-mega-inner"
+                        style={{
+                          gridTemplateColumns: `repeat(${(item.megaCols || []).length}, 1fr) 220px`,
+                        }}
+                      >
+                        {(item.megaCols || []).map((col) => (
+                          <div key={col._id}>
+                            {col.title && (
+                              <p className="nb-col-title">{col.title}</p>
+                            )}
+                            <ul>
+                              {col.items.map((itm, k) => (
+                                <li key={k}>
+                                  <Link
+                                    href={itm.href || "/listing"}
+                                    className={`nb-mega-item${col.highlightLast && k === col.items.length - 1 ? " highlight" : ""}`}
+                                  >
+                                    {itm.label}
+                                  </Link>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
                         ))}
+
+                        {/* Featured images — ab item.megaImgs se */}
+                        {(item.megaImgs || []).length > 0 && (
+                          <div className="nb-mega-imgs">
+                            {item.megaImgs.map((img) => (
+                              <Link
+                                key={img._id}
+                                href={img.href || "/listing"}
+                                className="nb-mega-img-wrap"
+                              >
+                                <img src={img.src} alt={img.alt} />
+                                <span className="nb-mega-img-label">
+                                  {img.alt}
+                                </span>
+                              </Link>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               ) : (
                 <Link
@@ -387,7 +397,12 @@ export default function Navbar() {
         </div>
       )}
 
-      <MobileSidebar isOpen={isOpen} setIsOpen={setIsOpen} navData={navData} setOpenModel={setOpenModel}/>
+      <MobileSidebar
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        navData={navData}
+        setOpenModel={setOpenModel}
+      />
       {openModel && <SignupModal onClose={() => setOpenModel(false)} />}
     </>
   );

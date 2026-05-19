@@ -45,6 +45,7 @@ const ProductPage = async ({ params }) => {
 
   const { product } = await api.product.getOne(slug);
 
+
   return (
     <>
       <style>{pageStyles}</style>

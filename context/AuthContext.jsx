@@ -31,7 +31,7 @@ export function AuthProvider({ children }) {
 
       console.log("User data refreshed:", u);
       setUser(u);
-    } catch {
+    } catch (err) {
      if (err.response?.status === 401) {
       removeToken();
       setUser(null);
