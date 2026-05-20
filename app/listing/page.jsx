@@ -244,7 +244,7 @@ function ProductListingInner() {
 
   function searchParamsToFilters(sp) {
     const f = {};
-    ["category","metal","metal.purity","sort","minPrice","maxPrice"].forEach(k => {
+    ["category","metal","metal.purity","sort","minPrice","maxPrice", "occasion"].forEach(k => {
       const v = sp.get(k); if (v) f[k] = v;
     });
     return f;
