@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
-const ImageCard = ({ title, imgUrl }) => {
+const ImageCard = ({ title, imgUrl , link="/listing"}) => {
   const [hovered, setHovered] = useState(false);
   return (
     <>
@@ -34,7 +34,7 @@ const ImageCard = ({ title, imgUrl }) => {
   @media (max-width: 500px) { .ic-wrap { max-width: 90px; } }
 `}</style>
       <Link
-        href="/listing"
+        href={link}
         className="ic-wrap"
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}

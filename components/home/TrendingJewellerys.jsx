@@ -56,7 +56,7 @@ const TrendingJewellerys = ({ settings = {}, products = [] }) => {
         <TitleSection title={title} subtitle={subtitle} width="1320px">
           <div className="tj-grid">
             {items.map((item, i) => (
-              <Link href={item.slug ? `/product?slug=${item.slug}` : "/listing"} key={i} className="tj-card">
+              <Link href={item.slug ? `/product/${item.slug}` : "/listing"} key={i} className="tj-card">
                 <div className="tj-card-img-wrap">
                   <img src={item.img} alt={item.title} />
                   <span className="tj-tag">{item.tag}</span>

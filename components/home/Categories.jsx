@@ -2,13 +2,13 @@ import TitleSection from "../common/TitleSection";
 import ImageCard from "../common/ImageCard";
 
 const categoriesData = [
-  { id: 1, title: "Rings", imgUrl: "https://www.tanishq.co.in/dw/image/v2/BKCK_PRD/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dw2562a9fe/homepage/shopByCategory/rings-cat.jpg" },
-  { id: 2, title: "Earrings", imgUrl: "https://www.tanishq.co.in/dw/image/v2/BKCK_PRD/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dw2562a9fe/homepage/shopByCategory/earrings-cat.jpg" },
-  { id: 3, title: "Necklaces", imgUrl: "https://www.tanishq.co.in/dw/image/v2/BKCK_PRD/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dw2562a9fe/homepage/shopByCategory/necklaces-cat.jpg" },
-  { id: 4, title: "Bracelets", imgUrl: "https://www.tanishq.co.in/dw/image/v2/BKCK_PRD/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dw2562a9fe/homepage/shopByCategory/bracelets-cat.jpg" },
-  { id: 5, title: "Bangles", imgUrl: "https://www.tanishq.co.in/dw/image/v2/BKCK_PRD/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dw2562a9fe/homepage/shopByCategory/bangles-cat.jpg" },
-  { id: 6, title: "Mangalsutra", imgUrl: "https://www.tanishq.co.in/dw/image/v2/BKCK_PRD/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dw2562a9fe/homepage/shopByCategory/mangalsutra-cat.jpg" },
-  { id: 7, title: "Pendants", imgUrl: "https://www.tanishq.co.in/dw/image/v2/BKCK_PRD/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dw2562a9fe/homepage/shopByCategory/pendants-cat.jpg" },
+  { id: 1, title: "Rings", imgUrl: "https://www.tanishq.co.in/dw/image/v2/BKCK_PRD/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dw2562a9fe/homepage/shopByCategory/rings-cat.jpg", link: "/listing?category=Ring" },
+  { id: 2, title: "Earrings", imgUrl: "https://www.tanishq.co.in/dw/image/v2/BKCK_PRD/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dw2562a9fe/homepage/shopByCategory/earrings-cat.jpg", link: "/listing?category=Earring" },
+  { id: 3, title: "Necklaces", imgUrl: "https://www.tanishq.co.in/dw/image/v2/BKCK_PRD/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dw2562a9fe/homepage/shopByCategory/necklaces-cat.jpg", link: "/listing?category=Necklace" },
+  { id: 4, title: "Bracelets", imgUrl: "https://www.tanishq.co.in/dw/image/v2/BKCK_PRD/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dw2562a9fe/homepage/shopByCategory/bracelets-cat.jpg", link: "/listing?category=Bracelet" },
+  { id: 5, title: "Bangles", imgUrl: "https://www.tanishq.co.in/dw/image/v2/BKCK_PRD/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dw2562a9fe/homepage/shopByCategory/bangles-cat.jpg", link: "/listing?category=Bangle" },
+  { id: 6, title: "Mangalsutra", imgUrl: "https://www.tanishq.co.in/dw/image/v2/BKCK_PRD/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dw2562a9fe/homepage/shopByCategory/mangalsutra-cat.jpg", link: "/listing?category=Mangalsutra" },
+  { id: 7, title: "Pendants", imgUrl: "https://www.tanishq.co.in/dw/image/v2/BKCK_PRD/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dw2562a9fe/homepage/shopByCategory/pendants-cat.jpg", link: "/listing?category=Pendant" },
 ];
 
 // const Categories = () => (
@@ -89,7 +89,7 @@ const Categories = () => (
       <TitleSection title={'Find Your Perfect <em>Match</em>'} subtitle="Shop by Categories" width="1320px">
         <div className="cat-grid">
           {categoriesData.map((item) => (
-            <ImageCard key={item.id} title={item.title} imgUrl={item.imgUrl} />
+            <ImageCard key={item.id} title={item.title} imgUrl={item.imgUrl} link={item.link} />
           ))}
           <div className="cat-view-all">
             <div className="cat-view-all-ring">
