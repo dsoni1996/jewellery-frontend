@@ -1,4 +1,3 @@
-
 "use client";
 import { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { authApi, cartApi, wishlistApi, getToken, setToken, removeToken } from "../lib/api";
@@ -6,10 +5,10 @@ import { authApi, cartApi, wishlistApi, getToken, setToken, removeToken } from "
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [user,          setUser]       = useState(null);
-  const [cartCount,     setCartCount]  = useState(0);
-  const [wishlistIds,   setWishlistIds] = useState(new Set());
-  const [loading,       setLoading]    = useState(true);  // initial auth check
+  const [user,        setUser]        = useState(null);
+  const [cartCount,   setCartCount]   = useState(0);
+  const [wishlistIds, setWishlistIds] = useState(new Set());
+  const [loading,     setLoading]     = useState(true);
 
   /* ── Initialise: restore session on mount ── */
   useEffect(() => {
@@ -27,15 +26,12 @@ export function AuthProvider({ children }) {
   const refreshUser = useCallback(async () => {
     try {
       const { user: u } = await authApi.getMe();
-
-
-      console.log("User data refreshed:", u);
       setUser(u);
     } catch (err) {
-     if (err.response?.status === 401) {
-      removeToken();
-      setUser(null);
-    }
+      if (err.status === 401) {
+        removeToken();
+        setUser(null);
+      }
     } finally {
       setLoading(false);
     }
@@ -74,9 +70,22 @@ export function AuthProvider({ children }) {
     return u;
   };
 
-  /* ── Verify OTP ── */
-  const verifyOtp = async (phone, otp) => {
-    const { token, user: u } = await authApi.verifyOtp(phone, otp);
+  /* ── Verify OTP ──
+       Phone se:  verifyOtp({ phone, otp })
+       Email se:  verifyOtp({ email, otp })
+  ── */
+  const verifyOtp = async ({ phone, email, otp }) => {
+    const payload = { otp, ...(email ? { email } : { phone }) };
+    const { token, user: u } = await authApi.verifyOtp(payload);
+    setToken(token);
+    setUser(u);
+    await Promise.all([refreshCart(), refreshWishlist()]);
+    return u;
+  };
+
+  /* ── Google OAuth login ── */
+  const googleLogin = async (idToken) => {
+    const { token, user: u } = await authApi.googleAuth(idToken);
     setToken(token);
     setUser(u);
     await Promise.all([refreshCart(), refreshWishlist()]);
@@ -94,11 +103,10 @@ export function AuthProvider({ children }) {
 
   /* ── Toggle wishlist (optimistic update) ── */
   const toggleWishlist = async (productId) => {
-    if (!user) return false; // prompt login
-    const prev = new Set(wishlistIds);
-    const adding = !wishlistIds.has(productId);
+    if (!user) return false;
+    const prev    = new Set(wishlistIds);
+    const adding  = !wishlistIds.has(productId);
 
-    // Optimistic
     setWishlistIds(s => {
       const n = new Set(s);
       adding ? n.add(productId) : n.delete(productId);
@@ -109,7 +117,7 @@ export function AuthProvider({ children }) {
       await wishlistApi.toggle(productId);
       return adding;
     } catch {
-      setWishlistIds(prev); // rollback
+      setWishlistIds(prev);
       return null;
     }
   };
@@ -119,7 +127,7 @@ export function AuthProvider({ children }) {
       user, loading,
       cartCount, setCartCount,
       wishlistIds,
-      login, register, verifyOtp, logout,
+      login, register, verifyOtp, googleLogin, logout,
       toggleWishlist,
       refreshUser, refreshCart, refreshWishlist,
       isLoggedIn: !!user,
@@ -134,4 +142,3 @@ export const useAuth = () => {
   if (!ctx) throw new Error("useAuth must be used inside <AuthProvider>");
   return ctx;
 };
-
