@@ -1,4 +1,5 @@
 "use client";
+import { SITE } from "@/config/site";
 import React, { useState } from "react";
 import { X, ArrowRight, Loader2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
@@ -100,7 +101,7 @@ const SignupModal = ({ onClose }) => {
             <img src="https://images.unsplash.com/photo-1603252109303-2751441dd157?w=600" alt="jewellery" />
             <div className="sm-left-overlay" />
             <div className="sm-left-text">
-              <p className="sm-left-tag">Since 1985</p>
+              <p className="sm-left-tag">{SITE.name}</p>
               <p className="sm-left-quote">"Crafting timeless beauty, one jewel at a time."</p>
             </div>
           </div>
@@ -171,7 +172,7 @@ const SignupModal = ({ onClose }) => {
             {step === "success" && (
               <div className="sm-welcome">
                 <div className="sm-welcome-icon">✨</div>
-                <h2 className="sm-welcome-title">Welcome to MANAS!</h2>
+                <h2 className="sm-welcome-title">Welcome to {SITE.name}!</h2>
                 <p className="sm-welcome-sub">You are now logged in. Redirecting…</p>
               </div>
             )}

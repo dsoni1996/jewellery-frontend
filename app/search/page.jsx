@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import { productApi } from "@/lib/api";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Search, X, SlidersHorizontal } from "lucide-react";
 import ProductCard from "../../components/common/ProductCard";
@@ -50,28 +51,22 @@ const styles = `
   .sr-empty-sub { font-size: 13px; color: #9E8875; }
 `;
 
-const suggestions = ["Gold Rings", "Diamond Necklace", "Bangles", "Mangalsutra", "Earrings", "Bracelets"];
-
-const allProducts = [
-  { id: 1, name: "Aakarshan Gold Necklace", price: 112732, img: "https://picsum.photos/400/400?random=11", cat: "Necklaces" },
-  { id: 2, name: "Diamond Finger Ring", price: 52697, img: "https://picsum.photos/400/400?random=22", cat: "Rings" },
-  { id: 3, name: "Floral Gold Bangle", price: 87450, img: "https://picsum.photos/400/400?random=33", cat: "Bangles" },
-  { id: 4, name: "Pearl Drop Earrings", price: 34200, img: "https://picsum.photos/400/400?random=44", cat: "Earrings" },
-  { id: 5, name: "Emerald Gold Pendant", price: 67890, img: "https://picsum.photos/400/400?random=55", cat: "Pendants" },
-  { id: 6, name: "Ruby Mangalsutra", price: 45600, img: "https://picsum.photos/400/400?random=66", cat: "Mangalsutras" },
-  { id: 7, name: "Diamond Tennis Bracelet", price: 98000, img: "https://picsum.photos/400/400?random=77", cat: "Bracelets" },
-  { id: 8, name: "Gold Polki Earrings", price: 72000, img: "https://picsum.photos/400/400?random=88", cat: "Earrings" },
-];
+const suggestions = ["Jhumka", "Kundan", "Necklace", "Bangles", "Earrings", "Bridal Set"];
 
 export default function SearchPage() {
-  const [query, setQuery] = useState("Gold Rings");
+  const [query, setQuery] = useState("");
   const [activeChip, setActiveChip] = useState(null);
+  const [filtered, setFiltered] = useState([]);
 
-  const filtered = allProducts.filter(p =>
-    p.name.toLowerCase().includes(query.toLowerCase()) ||
-    p.cat.toLowerCase().includes(query.toLowerCase()) ||
-    (activeChip && p.cat.toLowerCase().includes(activeChip.toLowerCase()))
-  );
+  useEffect(() => {
+    const t = setTimeout(async () => {
+      try {
+        const res = await productApi.getAll({ search: query.trim(), limit: 24 });
+        setFiltered((res.products || []).map(p => ({ id: p._id, slug: p.slug, name: p.name, price: p.price?.current, img: p.thumbnail })));
+      } catch { setFiltered([]); }
+    }, 300);
+    return () => clearTimeout(t);
+  }, [query]);
 
   return (
     <>
@@ -134,7 +129,7 @@ export default function SearchPage() {
           ) : (
             <div className="sr-grid">
               {filtered.map(item => (
-                <ProductCard key={item.id} product={{ title: item.name, price: item.price, imgUrl: item.img }} />
+                <ProductCard key={item.id} product={{ id: item.id, slug: item.slug, title: item.name, price: item.price, imgUrl: item.img }} />
               ))}
             </div>
           )}

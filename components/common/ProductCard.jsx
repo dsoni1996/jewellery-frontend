@@ -1,4 +1,5 @@
 "use client";
+import { SITE } from "@/config/site";
 import React, { useState } from "react";
 import { Heart, ShoppingBag } from "lucide-react";
 import Link from "next/link";
@@ -69,7 +70,7 @@ const cardStyles = `
 `;
 
 const ProductCard = ({ product, showToast  }) => {
-  const { title, price, imgUrl, id , occasion, badge} = product;
+  const { title, price, imgUrl, id , occasion, badge, tag} = product;
   const [wishlisted, setWishlisted] = useState(false);
   const { addItem } = useCart();
 
@@ -78,7 +79,7 @@ const ProductCard = ({ product, showToast  }) => {
       e.preventDefault();
       e.stopPropagation();
 
-      const token = localStorage.getItem("manas_token");
+      const token = localStorage.getItem(SITE.tokenKey);
 
       if (!token) {
         alert("Login required");
@@ -100,7 +101,7 @@ const ProductCard = ({ product, showToast  }) => {
       e.preventDefault();
       e.stopPropagation();
 
-      const token = localStorage.getItem("manas_token");
+      const token = localStorage.getItem(SITE.tokenKey);
       if (!token) {
         alert("Login required");
         return;
@@ -149,9 +150,7 @@ const ProductCard = ({ product, showToast  }) => {
           {title && (
             <>
               <p className="pc-title">{title}</p>
-              <p className="pc-meta">
-                22 KT Gold &nbsp;·&nbsp; <span className="pc-gold-dot" />
-              </p>
+              {tag ? <p className="pc-meta">{tag}</p> : null}
               <div className="pc-footer">
                 <span className="pc-price">
                   {price ? `₹ ${Number(price).toLocaleString("en-IN")}` : "₹ —"}

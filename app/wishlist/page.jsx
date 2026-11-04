@@ -1,4 +1,5 @@
-  "use client";
+"use client";
+import { categoryLabel } from "@/config/site";
   import { useEffect, useState } from "react";
   import Link from "next/link";
   import { Heart, ShoppingBag, Trash2, ArrowLeft, Loader2 } from "lucide-react";
@@ -147,14 +148,14 @@
                         alt={item.name}
                         className="wl-card-img"
                       />
-                      <span className="wl-card-tag">{item.metal?.purity} {item.category}</span>
+                      <span className="wl-card-tag">{item.imitation?.plating || categoryLabel(item.category)}</span>
                       <button className="wl-card-remove" onClick={() => handleRemove(item._id)}>
                         <Trash2 size={13} />
                       </button>
                     </div>
                     <div className="wl-card-body">
                       <p className="wl-card-name">{item.name}</p>
-                      <p className="wl-card-meta">{item.metal?.purity} {item.metal?.type} · {item.metal?.weight}g</p>
+                      <p className="wl-card-meta">{[item.imitation?.baseMaterial, item.imitation?.style].filter(Boolean).join(" · ") || "Imitation Jewellery"}</p>
                       <div className="wl-card-footer">
                         <span className="wl-card-price">{fmt(item.price?.current)}</span>
                         <button

@@ -302,62 +302,42 @@ const Accordion = ({ title, children, defaultOpen = false }) => {
 const ProductDetails = ({product}) => {
   const [tab, setTab] = useState("details");
 
+  const im = product?.imitation || {};
   const productDetailsData = [
   {
-    title: "METAL DETAILS",
+    title: "PRODUCT DETAILS",
     data: [
-      { value: product?.metal?.purity, label: "Karatage" },
-      { value: product?.metal?.colour, label: "Material Colour" },
-      { value: `${product?.metal?.weight} g`, label: "Weight" },
-      { value: product?.metal?.type, label: "Metal" },
-      { value: product?.variants?.sizes?.[0] || "-", label: "Size" },
+      { value: im.baseMaterial || "—", label: "Base Material" },
+      { value: im.plating || "—", label: "Finish / Plating" },
+      { value: im.style || "—", label: "Style" },
+      { value: product?.variants?.sizes?.[0] || "—", label: "Size" },
+      ...(im.dimensions ? [{ value: im.dimensions, label: "Dimensions" }] : []),
+      ...(im.nickelFree ? [{ value: "Yes", label: "Nickel Free" }] : []),
+      ...(im.antiTarnish ? [{ value: "Yes", label: "Anti-Tarnish" }] : []),
     ],
   },
   {
     title: "STONE DETAILS",
-    data: product?.stones
-      ? [
-          { value: product.stones.type, label: "Stone Type" },
-          { value: product.stones.clarity, label: "Clarity" },
-          { value: product.stones.weight, label: "Carat Weight" },
-        ]
+    data: product?.stones?.type
+      ? [{ value: product.stones.type, label: "Stone Type" }]
       : [{ value: "No Stones", label: "" }],
   },
   {
     title: "GENERAL DETAILS",
     data: [
       { value: product?.category, label: "Product Type" },
-      { value: "Unisex", label: "Gender" },
-      { value: product?.certification, label: "Certification" },
+      { value: "Imitation Jewellery", label: "Jewellery Type" },
+      ...(product?.pieces > 1 ? [{ value: `${product.pieces} pcs`, label: "Set Contains" }] : []),
     ],
   },
+  ...(product?.careInstructions
+    ? [{ title: "CARE", data: [{ value: product.careInstructions, label: "" }] }]
+    : []),
   {
     title: "DESCRIPTION",
     data: [{ value: product?.description, label: "" }],
   },
 ];
-
-const priceBreakupData = [
-  {
-    name: product?.metal?.type,
-    sub: product?.metal?.purity,
-    rate: "—",
-    weight: `${product?.metal?.weight}g`,
-    discount: product?.price?.discountPercent || "—",
-    value: `₹ ${product?.price?.current}`,
-  },
-  {
-    name: "Making Charges",
-    value: `₹ ${product?.makingCharges}`,
-  },
-  {
-    name: "GST (3%)",
-    value: `₹ ${Math.round(product?.price?.current * 0.03)}`,
-  },
-];
-
-const gst = Math.round(product?.price?.current * 0.03);
-const grandTotal = (product?.price?.current || 0) + (product?.makingCharges || 0) + gst
 
   return (
     <>
@@ -379,12 +359,6 @@ const grandTotal = (product?.price?.current || 0) + (product?.makingCharges || 0
           >
             Product Details
           </button>
-          <button
-            className={`pd-tab${tab === "price" ? " active" : ""}`}
-            onClick={() => setTab("price")}
-          >
-            Price Breakup
-          </button>
         </div>
 
         {/* Tab content */}
@@ -395,7 +369,7 @@ const grandTotal = (product?.price?.current || 0) + (product?.makingCharges || 0
             <div>
               {productDetailsData.map((section, i) => (
                 <Accordion key={i} title={section.title} defaultOpen={i === 0}>
-                  {section.title === "DESCRIPTION" ? (
+                  {section.title === "DESCRIPTION" || section.title === "CARE" ? (
                     <p className="pd-desc-text">{section.data[0].value}</p>
                   ) : (
                     <div className="pd-detail-grid">
@@ -412,42 +386,6 @@ const grandTotal = (product?.price?.current || 0) + (product?.makingCharges || 0
             </div>
           )}
 
-          {/* ── PRICE BREAKUP tab ── */}
-          {tab === "price" && (
-            <div className="pd-accordion" style={{ overflow: "hidden" }}>
-              <table className="pd-price-table">
-                <thead>
-                  <tr>
-                    <th>Component</th>
-                    <th>Rate</th>
-                    <th>Weight</th>
-                    <th>Discount</th>
-                    <th>Value</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {priceBreakupData.map((row, i) => (
-                    <tr key={i}>
-                      <td>
-                        <strong style={{ display: "block", color: "#2C1A0E", fontWeight: 500 }}>{row.name}</strong>
-                        {row.sub && <span className="pd-price-sub">{row.sub}</span>}
-                      </td>
-                      <td>{row.rate}</td>
-                      <td>{row.weight}</td>
-                      <td>{row.discount}</td>
-                      <td>{row.value}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              <div className="pd-price-total">
-                <span className="pd-price-total-label">Grand Total (incl. GST)</span>
-                <span className="pd-price-total-value">
-  ₹ {grandTotal.toLocaleString("en-IN")}
-</span>
-              </div>
-            </div>
-          )}
 
         </div>
       </div>
@@ -460,10 +398,10 @@ const grandTotal = (product?.price?.current || 0) + (product?.makingCharges || 0
     </span>
     <div className="pd-sticky-meta">
       <span>Size: <strong>{product?.variants?.sizes?.[0] || "—"}</strong></span>
-      <span>Weight: <strong>{product?.metal?.weight} g</strong></span>
+      <span>Finish: <strong>{product?.imitation?.plating || "—"}</strong></span>
     </div>
     <div className="pd-sticky-meta">
-      <span>Metal: <strong>{product?.metal?.purity} {product?.metal?.colour} {product?.metal?.type}</strong></span>
+      <span>Style: <strong>{product?.imitation?.style || "—"}</strong></span>
       <span>Stone: <strong>{product?.stones?.type || "No Stone"}</strong></span>
     </div>
   </div>

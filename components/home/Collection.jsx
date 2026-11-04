@@ -1,16 +1,17 @@
+import { SITE } from "@/config/site";
 import TitleSection from "../common/TitleSection";
 import Link from "next/link";
 
 const DEFAULT_ITEMS = [
-  { img: "https://www.tanishq.co.in/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dw3fd145e1/homepage/tanishq-collections/sparkling-desktop.jpg", title: "Sparkling Avenues",  sub: "Diamond Collection", span: "large", href: "/listing" },
-  { img: "https://www.tanishq.co.in/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dwfba22b76/homepage/tanishq-collections/stunning-every-ear.jpg",  title: "Stunning Every Ear", sub: "Earring Edit",      span: "small", href: "/listing" },
-  { img: "https://www.tanishq.co.in/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dw96c93899/homepage/tanishq-collections/ganesh-chaturthi.jpg",     title: "Festive Splendour",  sub: "Occasion Wear",    span: "small", href: "/listing" },
+  { img: "https://picsum.photos/seed/lakshmi-1/800/800", title: "Kundan & Meenakari",  sub: "Traditional Looks", span: "large", href: "/listing" },
+  { img: "https://picsum.photos/seed/lakshmi-2/800/800",  title: "Jhumkas & Earrings", sub: "Earring Edit",      span: "small", href: "/listing" },
+  { img: "https://picsum.photos/seed/lakshmi-3/800/800",     title: "Festive Splendour",  sub: "Occasion Wear",    span: "small", href: "/listing" },
 ];
 
 const Collection = ({ settings = {}, products = [] }) => {
   const items    = settings.collections?.length ? settings.collections : DEFAULT_ITEMS;
-  const title    = settings.title    || "Manas <em>Collections</em>";
-  const subtitle = settings.subtitle || "Explore our newly launched collection";
+  const title    = settings.title    || `${SITE.name} <em>Collections</em>`;
+  const subtitle = settings.subtitle || "Explore our latest styles";
 
   return (
     <>

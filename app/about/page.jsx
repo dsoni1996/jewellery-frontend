@@ -1,25 +1,13 @@
 "use client";
+import { SITE } from "@/config/site";
 import Link from "next/link";
 import { ArrowRight, Award, Shield, Star, Heart } from "lucide-react";
 
-const milestones = [
-  { year: "2025", title: "Manas Jewellers Founded", desc: "Manas Soni opens the first Manas Jewellers store in Indore, with a vision of bringing honest, pure, and beautifully crafted jewellery to every family." },
-  { year: "2025", title: "BIS Hallmarked from Day One", desc: "Every single piece at Manas Jewellers is BIS hallmarked — a commitment made from the very first day we opened our doors." },
-  { year: "2025", title: "IGI-Certified Diamond Collection", desc: "Launched our curated diamond jewellery line, offering IGI-certified pieces that bring international quality standards to Indore." },
-  { year: "2025", title: "Master Artisan Team", desc: "Built a team of skilled craftspeople trained in both traditional and contemporary jewellery-making techniques." },
-];
-
 const values = [
-  { icon: Award,  title: "Uncompromising Purity",  desc: "Every piece we craft is BIS hallmarked. Our gold is tested and certified — no exceptions, ever." },
-  { icon: Heart,  title: "Crafted with Love",       desc: "Each piece passes through skilled hands with great care before it reaches you. That is not just craft — it is love." },
-  { icon: Shield, title: "Trust from Day One",      desc: "From our very first day, we have built relationships with families based on complete transparency and honest pricing." },
-  { icon: Star,   title: "Innovation in Tradition", desc: "We honour ancient goldsmithing techniques while embracing modern design — so your jewellery is timeless and contemporary." },
-];
-
-const artisans = [
-  { name: "Manas Soni",     role: "Founder & Master Jeweller", exp: "Passionate Creator", img: "https://picsum.photos/200/200?random=501", spec: "22KT Gold & Diamond Jewellery" },
-  // { name: "Sunita Devi",    role: "Meenakari Artist",           exp: "Expert Artisan",    img: "https://picsum.photos/200/200?random=502", spec: "Rajasthani Enamel Work" },
-  // { name: "Arjun Patel",    role: "Diamond Setter",             exp: "Specialist",        img: "https://picsum.photos/200/200?random=503", spec: "Pavé & Channel Setting" },
+  { icon: Star,   title: "Trendy Designs",      desc: "Kundan, AD, temple, oxidised and more — styles picked to match what people actually wear." },
+  { icon: Heart,  title: "Made to Be Worn",     desc: "Pieces for weddings, festivals, parties and everyday looks, at prices that make sense." },
+  { icon: Shield, title: "Honest Labelling",    desc: "We sell imitation jewellery and say so clearly. No product is described as real gold, silver or hallmarked." },
+  { icon: Award,  title: "Care Guidance",       desc: "Every piece comes with simple care tips so your jewellery keeps its shine for longer." },
 ];
 
 const S = `
@@ -112,9 +100,9 @@ export default function AboutPage() {
         {/* Hero */}
         <div className="ab-hero">
           <div className="ab-hero-inner">
-            <span className="ab-hero-tag">Est. 2025 · Indore, India</span>
-            <h1 className="ab-hero-title">A New Chapter in<br /><em>Fine</em> Jewellery<br />Begins in <em>2025</em></h1>
-            <p className="ab-hero-desc">Manas Jewellers was born with one belief — every family deserves jewellery that is pure, beautiful, and made with heart. Our journey has just begun.</p>
+            <span className="ab-hero-tag">Imitation Jewellery</span>
+            <h1 className="ab-hero-title">Style for Every<br /><em>Occasion</em></h1>
+            <p className="ab-hero-desc">{SITE.fullName} brings you trendy imitation jewellery — bridal sets, jhumkas, necklaces, bangles and more.</p>
           </div>
         </div>
         <div className="ab-gold-line" />
@@ -124,22 +112,15 @@ export default function AboutPage() {
           <div className="ab-story-grid">
             <div className="ab-story-img-wrap">
               <img src="https://picsum.photos/600/750?random=601" alt="Our Store" className="ab-story-img" />
-              <div className="ab-story-badge">
-                <p className="ab-story-badge-num">1</p>
-                <p className="ab-story-badge-text">Year of Trust</p>
-              </div>
             </div>
             <div>
               <p className="ab-section-tag">Our Story</p>
-              <h2 className="ab-section-title">A Dream <em>Realized</em></h2>
+              <h2 className="ab-section-title">Jewellery for <em>Every Look</em></h2>
               <p className="ab-section-body" style={{ marginBottom: 20 }}>
-                It began with a single vision and an unwavering promise — to create jewellery that outlasts trends, outlives generations, and captures emotion in every gram.
-              </p>
-              <p className="ab-section-body" style={{ marginBottom: 20 }}>
-                Manas Soni founded Manas Jewellers in Indore in 2025. His belief is simple: every customer deserves the same quality that royalty demands. That belief drives everything we do.
+                {SITE.fullName} is an imitation jewellery store. We focus on designs that look great for weddings, festivals and everyday wear, without the price of real gold or diamonds.
               </p>
               <p className="ab-section-body" style={{ marginBottom: 32 }}>
-                Though we are a new name, our commitment to purity, craftsmanship, and honest relationships is absolute. We are not just a jewellery shop — we are memory-makers, right from day one.
+                Every product page tells you the base material, finish and style, so you know exactly what you are buying.
               </p>
               <Link href="/listing" className="ab-cta-btn" style={{ display: "inline-flex" }}>
                 Explore Our Collection <ArrowRight size={13} />
@@ -151,10 +132,10 @@ export default function AboutPage() {
         {/* Stats */}
         <div className="ab-stats">
           {[
-            { num: "2025", label: "Year Founded" },
-            { num: "100%", label: "BIS Hallmarked" },
-            { num: "IGI", label: "Certified Diamonds" },
-            { num: "∞", label: "Trust & Commitment" },
+            { num: "Kundan", label: "Traditional Styles" },
+            { num: "AD / CZ", label: "Party Wear" },
+            { num: "Bridal", label: "Wedding Sets" },
+            { num: "100%", label: "Honestly Labelled" },
           ].map((s, i) => (
             <div key={i} className="ab-stat">
               <p className="ab-stat-num">{s.num}</p>
@@ -177,49 +158,6 @@ export default function AboutPage() {
                 <p className="ab-value-desc">{v.desc}</p>
               </div>
             ))}
-          </div>
-        </div>
-
-        {/* Timeline */}
-        <div className="ab-section">
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 60, alignItems: "start" }}>
-            <div>
-              <p className="ab-section-tag">Our Journey</p>
-              <h2 className="ab-section-title">Milestones That <em>Matter</em></h2>
-              <p className="ab-section-body">Every step of our first year has been about building trust, perfecting craft, and serving the families of Indore with honesty and dedication.</p>
-            </div>
-            <div className="ab-timeline">
-              {milestones.map((m, i) => (
-                <div key={i} className="ab-tl-item">
-                  <div className="ab-tl-dot" />
-                  <p className="ab-tl-year">{m.year}</p>
-                  <p className="ab-tl-title">{m.title}</p>
-                  <p className="ab-tl-desc">{m.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Artisans */}
-        <div style={{ background: "#FFFDF9", padding: "72px 0", borderTop: "1px solid #E8DDD0" }}>
-          <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 40px" }}>
-            <div style={{ textAlign: "center", marginBottom: 8 }}>
-              <p className="ab-section-tag" style={{ justifyContent: "center" }}>The Hands Behind the Gold</p>
-              <h2 className="ab-section-title">Meet Our <em>Team</em></h2>
-            </div>
-            <div className="ab-artisans-grid">
-              {artisans.map((a, i) => (
-                <div key={i} className="ab-artisan-card">
-                  <img src={a.img} alt={a.name} className="ab-artisan-img" />
-                  <div className="ab-artisan-body">
-                    <p className="ab-artisan-name">{a.name}</p>
-                    <p className="ab-artisan-role">{a.role}</p>
-                    <p className="ab-artisan-spec">{a.spec} · {a.exp}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
 

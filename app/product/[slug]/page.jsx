@@ -1,3 +1,4 @@
+import { categoryLabel } from "@/config/site";
 import ProductImages from "../../../components/product/ProductImages";
 import ProductInfo from "../../../components/product/ProductInfo";
 import ProductDetails from "../../../components/product/ProductDetails";
@@ -52,7 +53,7 @@ const ProductPage = async ({ params }) => {
       <div className="pp-root">
         {/* Breadcrumb */}
         <p className="pp-breadcrumb">
-          Home / Jewellery / Necklaces / <span>Aakarshan Gold Necklace</span>
+          Home / Jewellery / {categoryLabel(product.category)} / <span>{product.name}</span>
         </p>
 
         {/* Main section: image LEFT, info RIGHT */}

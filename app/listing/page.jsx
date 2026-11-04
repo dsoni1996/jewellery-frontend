@@ -1,4 +1,5 @@
 "use client";
+import { SITE, categoryLabel } from "@/config/site";
 import { useState, useEffect, useRef } from "react";
 import { Suspense } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
@@ -7,16 +8,9 @@ import ProductCard from "../../components/common/ProductCard";
 import { useProducts, useToast } from "../../hooks";
 import { Toast } from "@/components/common/Toast";
 
-const CATEGORIES = ["Ring","Necklace","Earring","Bangle","Bracelet","Mangalsutra","Pendant"];
-const PURITIES   = ["22KT","18KT","14KT"];
-const METALS = ["Gold", "Silver", "Platinum"];
-
-const PURITY_BY_MATERIAL = {
-  Gold: ["24KT", "22KT", "18KT", "14KT"],
-  Silver: ["999", "925"],
-  Platinum: ["950"],
-  Other: [],
-};
+const CATEGORIES = SITE.categories.map((c) => c.value);
+const PLATINGS   = SITE.platings;
+const STYLES     = SITE.styles;
 
 const SORT_OPTIONS = [
   { value: "",           label: "Recommended" },
@@ -236,15 +230,15 @@ function ProductListingInner() {
 
   /* Drawer local state */
   const [drawerCat,  setDrawerCat]  = useState("");
-  const [drawerMetal, setDrawerMetal] = useState("Gold");
-  const [drawerPur,  setDrawerPur]  = useState("");
+  const [drawerPlating, setDrawerPlating] = useState("");
+  const [drawerStyle,   setDrawerStyle]   = useState("");
   const [drawerSort, setDrawerSort] = useState("");
   const [drawerMin,  setDrawerMin]  = useState("");
   const [drawerMax,  setDrawerMax]  = useState("");
 
   function searchParamsToFilters(sp) {
     const f = {};
-    ["category","metal","metal.purity","sort","minPrice","maxPrice", "occasion"].forEach(k => {
+    ["category","plating","style","sort","minPrice","maxPrice", "occasion"].forEach(k => {
       const v = sp.get(k); if (v) f[k] = v;
     });
     return f;
@@ -258,9 +252,8 @@ function ProductListingInner() {
   }
 
   const initialFilters = {
-  metal: "Gold",
-  ...searchParamsToFilters(searchParams),
-};
+    ...searchParamsToFilters(searchParams),
+  };
   const initialPage    = Number(searchParams.get("page")) || 1;
 
   const { products, total, pages, page, loading, filters, setPage, setFilters, updateFilter } =
@@ -287,25 +280,23 @@ function ProductListingInner() {
   }, [searchParams]); // eslint-disable-line
 
   const activeCategory = filters.category        || "";
-  const activePurity   = filters["metal.purity"] || "";
+  const activePlating  = filters.plating         || "";
+  const activeStyle    = filters.style           || "";
   const activeSort     = filters.sort            || "";
-  const activeMetal = filters.metal || "";
-  const activePurities =
-  PURITY_BY_MATERIAL[activeMetal || "Gold"] || [];
 
   const safeUpdateFilter = (key, value) => { setPage(1); updateFilter(key, value); };
   const handleSort       = (e) => safeUpdateFilter("sort", e.target.value);
   const handlePriceApply = (min, max) => { setPage(1); setFilters(prev => ({ ...prev, minPrice: min, maxPrice: max })); };
 
-  const hasActiveFilters = activeCategory || activePurity || activeSort || filters.minPrice || filters.maxPrice;
-  const activeFilterCount = [activeCategory, activePurity, activeSort, filters.minPrice, filters.maxPrice].filter(Boolean).length;
+  const hasActiveFilters = activeCategory || activePlating || activeStyle || activeSort || filters.minPrice || filters.maxPrice;
+  const activeFilterCount = [activeCategory, activePlating, activeStyle, activeSort, filters.minPrice, filters.maxPrice].filter(Boolean).length;
 
   const clearAllFilters = () => { setPage(1); setFilters({}); };
 
   const openDrawer = () => {
     setDrawerCat(activeCategory);
-    setDrawerMetal(activeMetal || "Gold");
-    setDrawerPur(activePurity);
+    setDrawerPlating(activePlating);
+    setDrawerStyle(activeStyle);
     setDrawerSort(activeSort);
     setDrawerMin(filters.minPrice || "");
     setDrawerMax(filters.maxPrice || "");
@@ -315,10 +306,9 @@ function ProductListingInner() {
   const applyDrawer = () => {
     setPage(1);
     setFilters({
-       metal: "Gold",  
-      ...(drawerMetal ? { metal: drawerMetal }        : {}),
-      ...(drawerCat  ? { category: drawerCat }          : {}),
-      ...(drawerPur  ? { "metal.purity": drawerPur }    : {}),
+      ...(drawerCat     ? { category: drawerCat }       : {}),
+      ...(drawerPlating ? { plating: drawerPlating }    : {}),
+      ...(drawerStyle   ? { style: drawerStyle }        : {}),
       ...(drawerSort ? { sort: drawerSort }              : {}),
       ...(drawerMin  ? { minPrice: drawerMin }           : {}),
       ...(drawerMax  ? { maxPrice: drawerMax }           : {}),
@@ -338,18 +328,18 @@ function ProductListingInner() {
           <div className="pl-hero-content">
             <p className="pl-breadcrumb">
               Home &nbsp;/&nbsp; Jewellery
-              {activeCategory && ` / ${activeCategory}s`}
+              {activeCategory && ` / ${categoryLabel(activeCategory)}`}
             </p>
             <h1 className="pl-hero-title">
               {activeCategory ? (
-                <em>{activeCategory}s</em>
+                <em>{categoryLabel(activeCategory)}</em>
               ) : (
                 <>
                   Our <em>Collection</em>
                 </>
               )}
             </h1>
-            <p className="pl-hero-sub">{total} Exquisite Designs</p>
+            <p className="pl-hero-sub">{total} Designs</p>
           </div>
         </div>
         <div className="pl-gold-line" />
@@ -371,7 +361,7 @@ function ProductListingInner() {
                 className={`ls-cat-pill${activeCategory === c ? " active" : ""}`}
                 onClick={() => safeUpdateFilter("category", c)}
               >
-                {c}s
+                {categoryLabel(c)}
               </button>
             ))}
 
@@ -379,11 +369,11 @@ function ProductListingInner() {
 
             <select
               className="ls-select"
-              value={activePurity}
-              onChange={(e) => safeUpdateFilter("metal.purity", e.target.value)}
+              value={activePlating}
+              onChange={(e) => safeUpdateFilter("plating", e.target.value)}
             >
-              <option value="">All Purity</option>
-              {activePurities.map((p) => (
+              <option value="">All Finishes</option>
+              {PLATINGS.map((p) => (
                 <option key={p} value={p}>
                   {p}
                 </option>
@@ -392,14 +382,13 @@ function ProductListingInner() {
 
             <select
               className="ls-select"
-              value={activeMetal}
-              onChange={(e) => safeUpdateFilter("metal", e.target.value)}
+              value={activeStyle}
+              onChange={(e) => safeUpdateFilter("style", e.target.value)}
             >
-              <option value="">All Metals</option>
-
-              {METALS.map((m) => (
-                <option key={m} value={m}>
-                  {m}
+              <option value="">All Styles</option>
+              {STYLES.map((s) => (
+                <option key={s} value={s}>
+                  {s}
                 </option>
               ))}
             </select>
@@ -445,7 +434,7 @@ function ProductListingInner() {
                 className={`ls-cat-pill${activeCategory === c ? " active" : ""}`}
                 onClick={() => safeUpdateFilter("category", c)}
               >
-                {c}s
+                {categoryLabel(c)}
               </button>
             ))}
           </div>
@@ -511,7 +500,7 @@ function ProductListingInner() {
                     imgUrl: item.thumbnail,
                     title: item.name,
                     price: item.price?.current,
-                    tag: `${item.metal?.purity} ${item.category}`,
+                    tag: [item.imitation?.plating, categoryLabel(item.category)].filter(Boolean).join(" · "),
                     occasion: item.occasion,
                     badge: item.badge,
                   }}
@@ -592,47 +581,50 @@ function ProductListingInner() {
                       className={`ls-drawer-pill${drawerCat === cat ? " active" : ""}`}
                       onClick={() => setDrawerCat(cat)}
                     >
-                      {cat}s
+                      {categoryLabel(cat)}
                     </button>
                   ))}
                 </div>
               </div>
-              {/* Metal */}
+              {/* Finish */}
               <div>
-                <p className="ls-drawer-section-label">Metal</p>
+                <p className="ls-drawer-section-label">Finish</p>
                 <div className="ls-drawer-pills">
-                  {METALS.map((m) => (
+                  <button
+                    className={`ls-drawer-pill${drawerPlating === "" ? " active" : ""}`}
+                    onClick={() => setDrawerPlating("")}
+                  >
+                    All
+                  </button>
+                  {PLATINGS.map((p) => (
                     <button
-                      key={m}
-                      className={`ls-drawer-pill${drawerMetal === m ? " active" : ""}`}
-                      onClick={() => {
-                        setDrawerMetal(m);
-                        setDrawerPur(""); // purity reset on metal change
-                      }}
+                      key={p}
+                      className={`ls-drawer-pill${drawerPlating === p ? " active" : ""}`}
+                      onClick={() => setDrawerPlating(p)}
                     >
-                      {m}
+                      {p}
                     </button>
                   ))}
                 </div>
               </div>
 
-              {/* Purity */}
+              {/* Style */}
               <div>
-                <p className="ls-drawer-section-label">Purity</p>
+                <p className="ls-drawer-section-label">Style</p>
                 <div className="ls-drawer-pills">
                   <button
-                    className={`ls-drawer-pill${drawerPur === "" ? " active" : ""}`}
-                    onClick={() => setDrawerPur("")}
+                    className={`ls-drawer-pill${drawerStyle === "" ? " active" : ""}`}
+                    onClick={() => setDrawerStyle("")}
                   >
                     All
                   </button>
-                  {(PURITY_BY_MATERIAL[drawerMetal] || []).map((p) => (
+                  {STYLES.map((s) => (
                     <button
-                      key={p}
-                      className={`ls-drawer-pill${drawerPur === p ? " active" : ""}`}
-                      onClick={() => setDrawerPur(p)}
+                      key={s}
+                      className={`ls-drawer-pill${drawerStyle === s ? " active" : ""}`}
+                      onClick={() => setDrawerStyle(s)}
                     >
-                      {p}
+                      {s}
                     </button>
                   ))}
                 </div>

@@ -1,9 +1,9 @@
 import Link from "next/link";
 
 const DEFAULT_ARRIVALS = [
-  { id: 1, title: "Silver Idols",  sub: "Festive Edition",   price: "₹ 12,500 onwards", img: "https://picsum.photos/600/420?random=81" },
-  { id: 2, title: "Floral Bloom",  sub: "Summer Collection", price: "₹ 28,000 onwards", img: "https://picsum.photos/600/420?random=82" },
-  { id: 3, title: "Heritage Craft",sub: "Artisan Series",    price: "₹ 45,000 onwards", img: "https://picsum.photos/600/420?random=83" },
+  { id: 1, title: "Kundan Sets",   sub: "New Collection", price: "", img: "https://picsum.photos/600/420?random=81" },
+  { id: 2, title: "Oxidised Edit", sub: "New Collection", price: "", img: "https://picsum.photos/600/420?random=82" },
+  { id: 3, title: "Bridal Sets",   sub: "New Collection", price: "", img: "https://picsum.photos/600/420?random=83" },
 ];
 
 const fmtPrice = p => p?.current ? "₹ " + Number(p.current).toLocaleString("en-IN") : null;
@@ -16,7 +16,7 @@ const NewArrival = ({ settings = {}, products = [] }) => {
     ? products.map((p, i) => ({
         id:    p._id || i,
         title: p.name,
-        sub:   p.metal?.purity ? `${p.metal.purity} ${p.metal.type || "Gold"}` : "New",
+        sub:   p.imitation?.plating || "New",
         price: fmtPrice(p.price) || "",
         img:   p.thumbnail,
         slug:  p.slug,
@@ -59,7 +59,7 @@ const NewArrival = ({ settings = {}, products = [] }) => {
           <div className="na-hero-text">
             <p className="na-hero-tag">Monday — Friday</p>
             <h2 className="na-hero-title">New <em>Arrivals</em><br />Dropping Daily</h2>
-            <p className="na-hero-desc">Explore the latest launches — fresh designs crafted by our master artisans, delivered straight from our ateliers to you.</p>
+            <p className="na-hero-desc">Explore our latest launches — fresh styles in kundan, AD, oxidised and bridal sets.</p>
             <Link href={ctaLink} className="na-hero-cta">{ctaText} →</Link>
           </div>
         </div>

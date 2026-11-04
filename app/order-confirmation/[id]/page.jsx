@@ -68,20 +68,8 @@ const styles = `
 `;
 
 const orderItems = [
-  {
-    id: 1,
-    name: "Aakarshan Gold Necklace",
-    meta: "22KT · 74.09g",
-    price: 112732,
-    img: "https://picsum.photos/120/120?random=11",
-  },
-  {
-    id: 2,
-    name: "Diamond Finger Ring",
-    meta: "18KT VVS1 · 5.63g",
-    price: 52697,
-    img: "https://picsum.photos/120/120?random=22",
-  },
+  { id: 1, name: "Kundan Jhumka", meta: "Gold Plated · Brass", price: 799, img: "https://picsum.photos/120/120?random=11" },
+  { id: 2, name: "AD Necklace Set", meta: "Rhodium Plated · Alloy", price: 1499, img: "https://picsum.photos/120/120?random=22" },
 ];
 
 const trackSteps = [
@@ -211,7 +199,7 @@ export default function OrderConfirmationPage() {
                 <span>₹ {order?.pricing?.subtotal || 0}</span>
               </div>
               <div className="oc-sum-row">
-                <span>GST (3%)</span>
+                <span>GST</span>
                 <span>₹ {order?.pricing?.gst || 0}</span>
               </div>
               <div className="oc-sum-row">

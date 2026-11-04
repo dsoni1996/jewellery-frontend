@@ -1,4 +1,5 @@
 "use client";
+import { SITE } from "@/config/site";
 import { FaHeart, FaShareAlt, FaRegCopy, FaCheck } from "react-icons/fa";
 import ActionButtons from "./ActionButtons";
 import { useState } from "react";
@@ -35,7 +36,7 @@ const infoStyles = `
 `;
 
 const ProductInfo = ({ product }) => {
-  const { name, sku, description, metal, price, variants } = product;
+  const { name, sku, description, imitation, price, variants } = product;
   const [copied, setCopied] = useState(false);
   const [wishlisted, setWishlisted] = useState(false);
   const { addItem } = useCart();
@@ -51,7 +52,7 @@ const ProductInfo = ({ product }) => {
 
      const addToCart = async (e) => {
 
-      const token = localStorage.getItem("manas_token");
+      const token = localStorage.getItem(SITE.tokenKey);
 
       if (!token) {
         alert("Login required");
@@ -105,13 +106,13 @@ const ProductInfo = ({ product }) => {
 
         <span className="pi-metal-tag">
           <span className="pi-metal-dot" />
-          {`${metal.purity} Karat ${metal.colour}  ${metal.weight}g Gross Weight`}
+          {[imitation?.plating, imitation?.baseMaterial, imitation?.style].filter(Boolean).join(" · ") || "Imitation Jewellery"}
         </span>
 
         <div className="pi-price-block">
           <p className="pi-price">₹ {price.current.toLocaleString("en-IN")}</p>
           <p className="pi-price-note">
-            Approximate price, excluding taxes. Subject to daily gold rate.
+            Price excludes GST. GST is added at checkout.
           </p>
         </div>
 
@@ -135,7 +136,7 @@ const ProductInfo = ({ product }) => {
         <div className="pi-trust">
           {[
             { icon: "🔒", text: "Secure Checkout" },
-            { icon: "✦", text: "BIS Hallmarked" },
+            { icon: "✦", text: "Imitation Jewellery" },
             { icon: "🔄", text: "Easy Returns" },
           ].map((t, i) => (
             <div key={i} className="pi-trust-item">

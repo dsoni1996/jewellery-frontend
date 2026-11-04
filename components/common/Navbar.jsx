@@ -1,4 +1,5 @@
 "use client";
+import { SITE } from "@/config/site";
 import { Heart, User, ShoppingBag, Menu, Search, X } from "lucide-react";
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
@@ -15,61 +16,18 @@ import { navApi } from "../../lib/api";
 const FALLBACK_NAV = {
   topbar: {
     visible: true,
-    text: "FREE SHIPPING ON ORDERS ABOVE ₹50,000 · BIS HALLMARKED JEWELLERY · VISIT OUR STORES",
+    text: "NEW ARRIVALS EVERY WEEK · TRENDY IMITATION JEWELLERY",
   },
   navItems: [
-    { _id: "1", name: "Brand",        href: "/about",                   visible: true, hasMegaMenu: false },
-    { _id: "2", name: "Masterpieces", href: "/listing?sort=rating",     visible: true, hasMegaMenu: false },
-    { _id: "3", name: "Jewellery",    href: "/listing",                 visible: true, hasMegaMenu: true  },
-    { _id: "4", name: "Weddings",     href: "/wedding",                 visible: true, hasMegaMenu: false },
-    { _id: "5", name: "Occasions",    href: "/listing?occasion=Festive",visible: true, hasMegaMenu: false },
-    { _id: "6", name: "Gold Rate",    href: "/gold-rate",               visible: true, hasMegaMenu: false },
-    { _id: "7", name: "Store",        href: "/contact",                 visible: true, hasMegaMenu: false },
+    { _id: "1", name: "Brand",        href: "/about",               visible: true, hasMegaMenu: false },
+    { _id: "2", name: "New Arrivals", href: "/listing?sort=newest", visible: true, hasMegaMenu: false },
+    { _id: "3", name: "Jewellery",    href: "/listing",             visible: true, hasMegaMenu: false },
+    { _id: "4", name: "Bridal",       href: "/wedding",             visible: true, hasMegaMenu: false },
+    { _id: "5", name: "Store",        href: "/contact",             visible: true, hasMegaMenu: false },
   ],
-  megaCols: [
-    {
-      _id: "c1", title: "By Category", highlightLast: false,
-      items: [
-        { label: "Earrings",     href: "/listing?category=Earring",     visible: true },
-        { label: "Rings",        href: "/listing?category=Ring",        visible: true },
-        { label: "Necklaces",    href: "/listing?category=Necklace",    visible: true },
-        { label: "Bangles",      href: "/listing?category=Bangle",      visible: true },
-        { label: "Mangalsutras", href: "/listing?category=Mangalsutra", visible: true },
-      ],
-    },
-    {
-      _id: "c2", title: "", highlightLast: true,
-      items: [
-        { label: "Pendants",      href: "/listing?category=Pendant",  visible: true },
-        { label: "Bracelets",     href: "/listing?category=Bracelet", visible: true },
-        { label: "Chains",        href: "/listing?category=Chain",    visible: true },
-        { label: "Coins",         href: "/listing?category=Other",    visible: true },
-        { label: "All Jewellery", href: "/listing",                   visible: true },
-      ],
-    },
-    {
-      _id: "c3", title: "By Metal", highlightLast: false,
-      items: [
-        { label: "Gold Jewellery",    href: "/listing?metal=Gold",  visible: true },
-        { label: "Diamond Jewellery", href: "/listing?purity=18KT", visible: true },
-        { label: "Polki Jewellery",   href: "/listing?style=Polki", visible: true },
-      ],
-    },
-    {
-      _id: "c4", title: "By Karatage", highlightLast: false,
-      items: [
-        { label: "14KT", href: "/listing?purity=14KT", visible: true },
-        { label: "18KT", href: "/listing?purity=18KT", visible: true },
-        { label: "22KT", href: "/listing?purity=22KT", visible: true },
-        { label: "24KT", href: "/listing?purity=24KT", visible: true },
-      ],
-    },
-  ],
-  megaImgs: [
-    { _id: "i1", src: "https://www.tanishq.co.in/dw/image/v2/BKCK_PRD/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dw2562a9fe/homepage/shopByCategory/rings-cat.jpg",    alt: "Rings",    href: "/listing?category=Ring",   visible: true },
-    { _id: "i2", src: "https://www.tanishq.co.in/dw/image/v2/BKCK_PRD/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dw18de0cb1/homepage/shopByCategory/earrings-cat.jpg", alt: "Earrings", href: "/listing?category=Earring", visible: true },
-  ],
-  searchHints: ["Gold Rings", "Diamond Necklace", "Bangles", "Mangalsutra", "Earrings", "Bridal Sets"],
+  megaCols: [],
+  megaImgs: [],
+  searchHints: ["Jhumka", "Kundan Set", "AD Necklace", "Bangles", "Oxidised Earrings", "Bridal Set"],
 };
 
 /* ══════════════════════════════
@@ -242,7 +200,7 @@ export default function Navbar() {
         <div className="nb-inner">
           {/* Logo */}
           <Link href="/" className="nb-logo">
-            MAN<span>A</span>S
+            {SITE.logo[0]}<span>{SITE.logo[1]}</span>{SITE.logo[2]}
           </Link>
 
           {/* Desktop nav — from backend */}

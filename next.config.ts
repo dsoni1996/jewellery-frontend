@@ -1,9 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-    images: {
-    domains: ["www.tanishq.co.in", "picsum.photos"],
+  images: {
+    remotePatterns: [
+      { protocol: "https", hostname: "res.cloudinary.com" },
+      { protocol: "https", hostname: "picsum.photos" },
+      { protocol: "https", hostname: "fastly.picsum.photos" },
+    ],
   },
 };
 

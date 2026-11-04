@@ -2,16 +2,16 @@ import TitleSection from "../common/TitleSection";
 import Link from "next/link";
 
 const DEFAULT_ITEMS = [
-  { img: "https://www.tanishq.co.in/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dw96c93899/homepage/tanishq-collections/ganesh-chaturthi.jpg",   tag: "Festive", title: "Ganesh Chaturthi Special", desc: "Sacred gold pieces for your most auspicious moments",                  price: "₹ 45,000 onwards" },
-  { img: "https://www.tanishq.co.in/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dw3fd145e1/homepage/tanishq-collections/sparkling-desktop.jpg",  tag: "Diamond", title: "Sparkling Avenues",        desc: "VVS diamonds set in 18K white and yellow gold",                        price: "₹ 1,20,000 onwards" },
-  { img: "https://www.tanishq.co.in/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dwfba22b76/homepage/tanishq-collections/stunning-every-ear.jpg", tag: "Trending",title: "Ear Candy Edit",           desc: "From subtle drops to bold chandeliers — all day, every day",          price: "₹ 18,000 onwards" },
+  { img: "https://picsum.photos/seed/lakshmi-7/800/800",   tag: "Festive", title: "Festive Specials", desc: "Traditional sets for your most auspicious moments",                  price: "" },
+  { img: "https://picsum.photos/seed/lakshmi-8/800/800",  tag: "Bridal", title: "Bridal Sets",        desc: "Complete sets for wedding functions",                        price: "" },
+  { img: "https://picsum.photos/seed/lakshmi-9/800/800", tag: "Trending",title: "Ear Candy Edit",           desc: "From subtle drops to bold chandeliers — all day, every day",          price: "" },
 ];
 
 const fmtPrice = p => p?.current ? "₹ " + Number(p.current).toLocaleString("en-IN") : null;
 
 const TrendingJewellerys = ({ settings = {}, products = [] }) => {
   const title    = settings.title    || "Trending <em>Now</em>";
-  const subtitle = settings.subtitle || "Jewellery pieces everyone's eyeing right now";
+  const subtitle = settings.subtitle || "Styles everyone is loving right now";
   const ctaLink  = settings.ctaLink  || "/listing";
   const ctaText  = settings.ctaText  || "View All";
 
@@ -19,7 +19,7 @@ const TrendingJewellerys = ({ settings = {}, products = [] }) => {
   const items = products.length > 0
     ? products.map(p => ({
         img:   p.thumbnail,
-        tag:   p.metal?.purity || "Gold",
+        tag:   p.imitation?.plating || "Trending",
         title: p.name,
         desc:  p.description || "",
         price: fmtPrice(p.price) || "",

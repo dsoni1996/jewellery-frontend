@@ -174,7 +174,7 @@ export default function CartPage() {
                         className="cart-item-img"
                       />
                       <div className="cart-item-info">
-                        <p className="cart-item-tag">{p?.metal?.purity} {p?.category}</p>
+                        <p className="cart-item-tag">{p?.category}</p>
                         <p className="cart-item-name">{p?.name}</p>
                         <p className="cart-item-meta">
                           {p?.metal?.type} · {p?.metal?.weight}g
@@ -213,7 +213,7 @@ export default function CartPage() {
                     <span>− {fmt(totals.discount)}</span>
                   </div>
                 )}
-                <div className="cart-summary-row"><span>GST (3%)</span><span>{fmt(totals?.gst)}</span></div>
+                <div className="cart-summary-row"><span>GST</span><span>{fmt(totals?.gst)}</span></div>
                 <div className="cart-summary-row"><span>Shipping</span><span style={{ color:"#2e7d32" }}>Free</span></div>
 
                 {/* Coupon */}
@@ -233,7 +233,6 @@ export default function CartPage() {
                     </div>
                     {couponMsg && <p className="cart-coupon-msg">✓ {couponMsg}</p>}
                     {couponErr && <p className="cart-coupon-err">⚠ {couponErr}</p>}
-                    <p style={{ fontSize:11,color:"#B0A090",marginTop:4,marginBottom:8 }}>Try: MANAS5 · BRIDAL10 · FLAT2000</p>
                   </>
                 )}
 
@@ -246,7 +245,6 @@ export default function CartPage() {
                 </Link>
                 <div className="cart-trust">
                   <span className="cart-trust-item">🔒 Secure</span>
-                  <span className="cart-trust-item">✦ BIS Certified</span>
                   <span className="cart-trust-item">🔄 Easy Returns</span>
                 </div>
               </div>

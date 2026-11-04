@@ -231,7 +231,7 @@ export default function CheckoutPage() {
               <div className="co-summary-rows">
                 <div className="co-summary-row"><span>Subtotal</span><span>{fmt(totals?.subtotal)}</span></div>
                 {(totals?.discount > 0) && <div className="co-summary-row" style={{ color:"#2e7d32" }}><span>Discount</span><span>−{fmt(totals.discount)}</span></div>}
-                <div className="co-summary-row"><span>GST (3%)</span><span>{fmt(totals?.gst)}</span></div>
+                <div className="co-summary-row"><span>GST</span><span>{fmt(totals?.gst)}</span></div>
                 <div className="co-summary-row"><span>Shipping</span><span style={{ color:"#2e7d32" }}>Free</span></div>
                 <div className="co-summary-row total"><span>Total</span><span className="val">{fmt(totals?.total)}</span></div>
               </div>

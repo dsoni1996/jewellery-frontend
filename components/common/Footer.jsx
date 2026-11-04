@@ -1,3 +1,4 @@
+import { SITE } from "@/config/site";
 const footerStyles = `
   @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600&family=Jost:wght@300;400;500&display=swap');
   .ft-root { background: #2C1A0E; color: #C8B89A; font-family: 'Jost', sans-serif; }
@@ -32,35 +33,28 @@ const footerStyles = `
 `;
 
 const shopLinks = [
-  { label: "Gold Jewellery",      href: "listing?metal=Gold" },
-  { label: "Diamond Jewellery",   href: "listing?metal=Diamond" },
-  { label: "Wedding Collection",  href: "listing?category=Wedding" },
-  { label: "New Arrivals",        href: "listing?sort=new" },
-  { label: "Trending Now",        href: "listing?sort=trending" },
+  { label: "All Jewellery",    href: "/listing" },
+  { label: "Bridal Sets",      href: "/wedding" },
+  { label: "New Arrivals",     href: "/listing?sort=newest" },
+  { label: "Top Rated",        href: "/listing?sort=rating" },
 ];
 
 const helpLinks = [
-  { label: "Track My Order",      href: "/track-order" },
-  { label: "Returns & Exchanges", href: "/returns" },
-  { label: "Delivery Information",href: "/delivery" },
-  { label: "Payment Options",     href: "/payment-options" },
-  { label: "FAQ",                 href: "/faq" },
+  { label: "Track My Order", href: "/track-order" },
+  { label: "Size Guide",     href: "/size-guide" },
+  { label: "Contact Us",     href: "/contact" },
 ];
 
 const companyLinks = [
   { label: "About Us",      href: "/about" },
-  { label: "Store Locator", href: "/stores" },
-  { label: "Blog",          href: "/blog" },
-  { label: "Careers",       href: "/careers" },
-  { label: "Press",         href: "/press" },
+  { label: "Store Locator", href: "/contact" },
 ];
 
 const socialLinks = [
-  { label: "f",  href: "https://facebook.com/manasjewellers",  title: "Facebook" },
-  { label: "in", href: "https://instagram.com/manasjewellers", title: "Instagram" },
-  { label: "yt", href: "https://youtube.com/@manasjewellers",  title: "YouTube" },
-  { label: "tw", href: "https://twitter.com/manasjewellers",   title: "Twitter / X" },
-];
+  { label: "f",  href: SITE.social.facebook,  title: "Facebook" },
+  { label: "in", href: SITE.social.instagram, title: "Instagram" },
+  { label: "yt", href: SITE.social.youtube,   title: "YouTube" },
+].filter((s) => s.href);
 
 const legalLinks = [
   { label: "Terms & Conditions", href: "/terms" },
@@ -77,10 +71,9 @@ const Footer = () => (
 
         {/* Brand */}
         <div className="ft-brand">
-          <a href="/" className="ft-logo">MAN<span>A</span>S</a>
+          <a href="/" className="ft-logo">{SITE.logo[0]}<span>{SITE.logo[1]}</span>{SITE.logo[2]}</a>
           <p className="ft-tagline">
-            Crafting timeless jewellery since 1985. BIS hallmarked gold, diamonds,
-            and precious stones for every life moment.
+            {SITE.tagline}
           </p>
           <div className="ft-social">
             {socialLinks.map((s, i) => (
@@ -98,7 +91,7 @@ const Footer = () => (
           </div>
           <div className="ft-trust">
             <div className="ft-trust-dot" />
-            BIS Certified &nbsp;·&nbsp; Secure Payments
+            Secure Payments
           </div>
         </div>
 
@@ -131,27 +124,12 @@ const Footer = () => (
             ))}
           </ul>
         </div>
-
-        {/* App Download */}
-        {/* <div className="ft-qr">
-          <p className="ft-col-title">Download App</p>
-          <p className="ft-qr-title">Scan to download the MANAS app</p>
-          <a href="/app" title="Download MANAS App">
-            <img
-              src="https://www.tanishq.co.in/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dw0fa1b94a/images/footer/tanishq-app-QR-code.svg"
-              alt="QR Code – Download MANAS App"
-            />
-          </a>
-        </div> */}
-
-        
-        
       </div>
 
       <hr className="ft-divider" />
 
       <div className="ft-bottom">
-        <p className="ft-copyright">© 2025 MANAS Jewellers. All Rights Reserved.</p>
+        <p className="ft-copyright">© {new Date().getFullYear()} {SITE.fullName}. All Rights Reserved.</p>
         <div className="ft-payment">
           {["VISA", "MC", "UPI", "PayPal", "Amex"].map((p, i) => (
             <span key={i} className="ft-payment-item">{p}</span>

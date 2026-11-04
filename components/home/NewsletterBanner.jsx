@@ -1,4 +1,5 @@
 "use client";
+import { SITE } from "@/config/site";
 import { useState } from "react";
 import { ArrowRight, Mail } from "lucide-react";
 
@@ -41,7 +42,7 @@ export default function NewsletterBanner({ settings = {} }) {
         <div className="nl-inner">
           <div className="nl-icon"><Mail size={20} /></div>
           <span className="nl-tag">Exclusive Offers</span>
-          <h2 className="nl-title">Join the <em>MANAS</em> Circle</h2>
+          <h2 className="nl-title">Join the <em>{SITE.name.toUpperCase()}</em> Circle</h2>
           <p className="nl-sub">{offerText}. Be the first to know about new arrivals, bridal collections and special events.</p>
 
           {!submitted ? (

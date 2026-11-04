@@ -1,4 +1,5 @@
 "use client";
+import { SITE } from "@/config/site";
 import { useState, useEffect } from "react";
 import {
   Phone, Mail, MapPin, Clock, ChevronDown,
@@ -89,9 +90,9 @@ const CONTACT_DETAILS = [
 
 // static contact info (not from DB — change as needed)
 const CONTACT_INFO = {
-  phone: "+91 731 421 0000\n+91 731 421 0001",
-  email: "care@manasjewellery.com",
-  hours: "Mon – Sun: 10:30 AM – 9:00 PM",
+  phone: "",
+  email: SITE.email,
+  hours: "",
 };
 
 export default function ContactPage() {
@@ -127,7 +128,7 @@ export default function ContactPage() {
       if (s[0]) {
         setContactInfo({
           phone: s[0].phone,
-          email: s[0].email || "care@manasjewellery.com",
+          email: s[0].email || SITE.email,
           hours: s[0].hours,
         });
       }
@@ -355,7 +356,7 @@ export default function ContactPage() {
                 : stores.map((store) => (
                     <div key={store._id} className="ct-info-card">
                       <div className="ct-info-head">
-                        <p className="ct-info-head-title">MANAS {store.city}</p>
+                        <p className="ct-info-head-title">{SITE.name} {store.city}</p>
                       </div>
                       <div className="ct-info-body">
                         <div className="ct-info-row">
@@ -393,7 +394,7 @@ export default function ContactPage() {
                             allowFullScreen
                             loading="lazy"
                             referrerPolicy="no-referrer-when-downgrade"
-                            title={`Map – MANAS ${store.city}`}
+                            title={`Map – ${SITE.name} ${store.city}`}
                           />
                         </div>
                       )}

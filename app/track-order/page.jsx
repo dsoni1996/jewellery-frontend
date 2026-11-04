@@ -136,7 +136,7 @@ export default function TrackOrderPage() {
               <div className="to-input-row">
                 <input
                   className="to-input"
-                  placeholder="e.g. MANAS-2025-00028"
+                  placeholder="e.g. LAKSHMI-2026-00001"
                   value={orderNum}
                   onChange={e => setOrderNum(e.target.value)}
                 />

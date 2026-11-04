@@ -1,49 +1,32 @@
 "use client";
+import { SITE } from "@/config/site";
 import { X, ChevronDown, Gem, Search, Heart, ShoppingBag, User } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 
-/* ── Category / Metal / Karatage route maps ── */
+/* ── Category / Style / Finish route maps (config/site.js se) ── */
 const CAT = {
-  "Earrings":      "/listing?category=Earring",
-  "Rings":         "/listing?category=Ring",
-  "Necklaces":     "/listing?category=Necklace",
-  "Bangles":       "/listing?category=Bangle",
-  "Mangalsutras":  "/listing?category=Mangalsutra",
-  "Pendants":      "/listing?category=Pendant",
-  "Bracelets":     "/listing?category=Bracelet",
-  "Chains":        "/listing?category=Chain",
-  "Coins":         "/listing?category=Other",
+  ...Object.fromEntries(SITE.categories.map((c) => [c.label, `/listing?category=${encodeURIComponent(c.value)}`])),
   "All Jewellery": "/listing",
 };
-const METAL = {
-  "Gold Jewellery":    "/listing?metal=Gold",
-  "Diamond Jewellery": "/listing?purity=18KT",
-  "Polki Jewellery":   "/listing?style=Polki",
-};
-const KT = {
-  "14KT": "/listing?purity=14KT",
-  "18KT": "/listing?purity=18KT",
-  "22KT": "/listing?purity=22KT",
-  "24KT": "/listing?purity=24KT",
-};
+const STYLE  = Object.fromEntries(SITE.styles.slice(0, 5).map((s) => [s, `/listing?style=${encodeURIComponent(s)}`]));
+const FINISH = Object.fromEntries(SITE.platings.slice(0, 4).map((p) => [p, `/listing?plating=${encodeURIComponent(p)}`]));
 
 const megaCols = [
-  { title: "By Category",  items: ["Earrings","Rings","Necklaces","Bangles","Mangalsutras","Pendants","Bracelets","Chains","Coins","All Jewellery"], map: CAT },
-  { title: "By Metal",     items: ["Gold Jewellery","Diamond Jewellery","Polki Jewellery"], map: METAL },
-  { title: "By Karatage",  items: ["14KT","18KT","22KT","24KT"], map: KT },
+  { title: "By Category", items: [...SITE.categories.map((c) => c.label), "All Jewellery"], map: CAT },
+  { title: "By Style",    items: Object.keys(STYLE),  map: STYLE },
+  { title: "By Finish",   items: Object.keys(FINISH), map: FINISH },
 ];
 
 /* ── Top-level menu with routes ── */
 const menuItems = [
   { name: "Brand",        href: "/about"                    },
-  { name: "Masterpieces", href: "/listing?sort=rating"      },
+  { name: "New Arrivals", href: "/listing?sort=newest"      },
   { name: "Jewellery",    href: "/listing", hasMegaMenu: true },
-  { name: "Weddings",     href: "/wedding"                  },
-  { name: "Occasions",    href: "/listing?occasion=Festive"  },
-  { name: "Gold Rate",    href: "/gold-rate"                 },
+  { name: "Bridal",       href: "/wedding"                  },
+  { name: "Occasions",    href: "/listing?occasion=festive" },
   { name: "Store",        href: "/contact"                  },
 ];
 
@@ -265,7 +248,7 @@ const dynamicNavItems = navData?.navItems || menuItems;
         {/* Footer */}
         <div className="msb-footer">
           <Gem size={13} style={{ color: "#B8862A" }} />
-          BIS Hallmarked &nbsp;·&nbsp; Since 1985
+          {SITE.fullName}
         </div>
       </div>
     </>

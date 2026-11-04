@@ -1,11 +1,12 @@
+import { SITE } from "@/config/site";
 
 
 
 const WORLD_ITEMS = [
-  { id:1, img:"https://picsum.photos/600/900?random=91",  tag:"Craftsmanship", title:"Master Artisans",       desc:"40 years of handcrafted excellence — every piece a legacy", href:"/about"                   },
-  { id:2, img:"https://picsum.photos/500/400?random=92",  tag:"Bridal",        title:"Wedding Edit",          desc:"Curated for your most precious day",                         href:"/wedding"                 },
-  { id:3, img:"https://picsum.photos/500/400?random=93",  tag:"Festive",       title:"Celebration Pieces",    desc:"Gold that marks every milestone",                            href:"/listing?occasion=Festive"},
-  { id:4, img:"https://picsum.photos/900/400?random=94",  tag:"New Season",    title:"Latest Arrivals",       desc:"Fresh designs from our master artisans",                     href:"/listing"                 },
+  { id:1, img:"https://picsum.photos/600/900?random=91",  tag:"Our Story",     title:"About Us",              desc:"Trendy imitation jewellery for every occasion", href:"/about"                   },
+  { id:2, img:"https://picsum.photos/500/400?random=92",  tag:"Bridal",        title:"Wedding Edit",          desc:"Bridal sets for every function",                               href:"/wedding"                 },
+  { id:3, img:"https://picsum.photos/500/400?random=93",  tag:"Festive",       title:"Celebration Pieces",    desc:"Styles for every celebration",                             href:"/listing?occasion=Festive"},
+  { id:4, img:"https://picsum.photos/900/400?random=94",  tag:"New Season",    title:"Latest Arrivals",       desc:"Fresh styles added regularly",                            href:"/listing"                 },
 ];
 
 const S = `
@@ -73,7 +74,7 @@ import Link from "next/link";
 import TitleSection from "../common/TitleSection";
 
 const ManasWorld = ({ settings = {} }) => {
-  const title    = settings.title    || "The MANAS <em>World</em>";
+  const title    = settings.title    || `The ${SITE.name} <em>World</em>`;
   const subtitle = settings.subtitle || "Explore The Universe";
 
   return (
@@ -105,7 +106,7 @@ const ManasWorld = ({ settings = {} }) => {
         </div>
 
         {/* <div className="mw-strip">
-          <span className="mw-strip-text">MANAS Jewellers · Since 1985</span>
+          <span className="mw-strip-text">{SITE.fullName}</span>
           <div className="mw-strip-dots">
             <div className="mw-strip-dot" />
             <div className="mw-strip-dot" />

@@ -1,4 +1,5 @@
 "use client";
+import { SITE } from "@/config/site";
 import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import {
@@ -22,37 +23,15 @@ const occasions = [
   // { id: "honeymoon",  label: "Honeymoon"         },
 ];
 
-const STATIC_SETS = [
-  { id:"s1", name:"Rani Haar Bridal Set",          sub:"The Grand Entrance",      occasion:["wedding"],             tag:"22KT Gold",    metal:"22 KT Yellow Gold",         weight:"98.4 g", pieces:5, piecesList:"Necklace · Earrings · Maang Tikka · Nose Ring · Bangles", price:524000, originalPrice:578000, rating:4.9, reviews:312, badge:"Bestseller", img:"https://picsum.photos/600/700?random=201", imgs:["https://picsum.photos/600/700?random=201","https://picsum.photos/600/700?random=202","https://picsum.photos/600/700?random=203"], description:"A statement bridal set crafted in 22KT gold, adorned with hand-set polki diamonds and meenakari enamel work. Made for the bride who commands every room." },
-  { id:"s2", name:"Solitaire Engagement Ring",     sub:"The Promise",             occasion:["engagement"],          tag:"18KT Diamond", metal:"18 KT White Gold",          weight:"4.2 g",  pieces:1, piecesList:"Ring",                                                     price:185000, originalPrice:185000, rating:4.8, reviews:246, badge:"New",        img:"https://picsum.photos/600/700?random=204", imgs:["https://picsum.photos/600/700?random=204","https://picsum.photos/600/700?random=205"], description:"A 1.2 ct VVS2 round brilliant diamond set in an 18KT white gold cathedral mount. Certified by IGI." },
-  { id:"s3", name:"Floral Meenakari Choker",       sub:"The Mehendi Morning",     occasion:["mehendi","sangeet"],   tag:"22KT Gold",    metal:"22 KT Yellow Gold",         weight:"42.6 g", pieces:3, piecesList:"Choker · Earrings · Maang Tikka",                         price:236000, originalPrice:258000, rating:4.7, reviews:189, badge:"Limited",    img:"https://picsum.photos/600/700?random=206", imgs:["https://picsum.photos/600/700?random=206","https://picsum.photos/600/700?random=207"], description:"Vivid meenakari enamel flowers in turquoise and coral set in a 22KT gold choker." },
-  { id:"s4", name:"Diamond Mangalsutra",           sub:"The Sacred Bond",         occasion:["wedding"],             tag:"18KT Diamond", metal:"18 KT Yellow & Black Gold", weight:"9.8 g",  pieces:1, piecesList:"Mangalsutra",                                             price:98500,  originalPrice:112000, rating:4.9, reviews:421, badge:"Bestseller", img:"https://picsum.photos/600/700?random=208", imgs:["https://picsum.photos/600/700?random=208","https://picsum.photos/600/700?random=209"], description:"Contemporary mangalsutra with VS clarity diamonds set between traditional black bead strands." },
-  { id:"s5", name:"Kundan Polki Necklace Set",     sub:"The Royal Sangeet",       occasion:["sangeet","reception"], tag:"22KT Gold",    metal:"22 KT Yellow Gold",         weight:"68.2 g", pieces:4, piecesList:"Necklace · Earrings · Maang Tikka · Ring",               price:368000, originalPrice:395000, rating:4.8, reviews:178, badge:null,          img:"https://picsum.photos/600/700?random=210", imgs:["https://picsum.photos/600/700?random=210","https://picsum.photos/600/700?random=211"], description:"Uncut polki diamonds set in the classic Kundan technique." },
-  { id:"s6", name:"Pearl & Diamond Reception Set", sub:"The Grand Finale",        occasion:["reception"],           tag:"18KT Diamond", metal:"18 KT White Gold",          weight:"22.4 g", pieces:3, piecesList:"Necklace · Earrings · Bracelet",                          price:295000, originalPrice:295000, rating:4.6, reviews:134, badge:"Exclusive",   img:"https://picsum.photos/600/700?random=212", imgs:["https://picsum.photos/600/700?random=212","https://picsum.photos/600/700?random=213"], description:"South Sea pearls paired with diamond pavé in 18KT white gold." },
-  { id:"s7", name:"Gold Kada Bangle Set",          sub:"The Everyday Bride",      occasion:["mehendi","honeymoon"], tag:"22KT Gold",    metal:"22 KT Yellow Gold",         weight:"56.0 g", pieces:6, piecesList:"6 Bangles",                                               price:312000, originalPrice:340000, rating:4.7, reviews:267, badge:null,          img:"https://picsum.photos/600/700?random=214", imgs:["https://picsum.photos/600/700?random=214","https://picsum.photos/600/700?random=215"], description:"A set of six hand-engraved gold kadas with delicate floral motifs." },
-  { id:"s8", name:"Emerald Gold Haath Phool",      sub:"The Detail That Dazzles", occasion:["wedding","reception"], tag:"22KT Gold",    metal:"22 KT Yellow Gold",         weight:"18.6 g", pieces:2, piecesList:"Hand Harness (pair)",                                     price:124000, originalPrice:138000, rating:4.5, reviews:98,  badge:"New",        img:"https://picsum.photos/600/700?random=216", imgs:["https://picsum.photos/600/700?random=216","https://picsum.photos/600/700?random=217"], description:"Colombian emerald centre stones surrounded by diamond halos." },
-];
-
-const STATIC_SLIDES = [
-  { img:"https://www.tanishq.co.in/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dw3fd145e1/homepage/tanishq-collections/sparkling-desktop.jpg", eyebrow:"2025 Bridal Collection", title:"Crafted for\nYour",         em:"Greatest Day"   },
-  { img:"https://www.tanishq.co.in/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dwfba22b76/homepage/tanishq-collections/stunning-every-ear.jpg", eyebrow:"The Engagement Edit",    title:"A Promise\nSet in",         em:"Gold & Diamond" },
-  { img:"https://www.tanishq.co.in/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dw96c93899/homepage/tanishq-collections/ganesh-chaturthi.jpg",   eyebrow:"Heritage Craftsmanship", title:"Timeless Beauty\nFor Your", em:"Every Ritual"   },
-];
-
 const STATIC_JOURNEY = [
   { num:"01", title:"Engagement",  desc:"Solitaires & couple rings that mark the beginning"          },
   { num:"02", title:"Mehendi",     desc:"Colourful meenakari & floral pieces for the joyful morning" },
   { num:"03", title:"Sangeet",     desc:"Polki & kundan sets to dazzle under the lights"             },
   { num:"04", title:"Wedding Day", desc:"Grand bridal sets — your most important look"               },
-  { num:"05", title:"Reception",   desc:"Diamonds & pearls for a refined evening statement"          },
+  { num:"05", title:"Reception",   desc:"Pearl & AD sets for a refined evening statement"             },
   { num:"06", title:"Honeymoon",   desc:"Wearable everyday pieces that travel with your story"       },
 ];
 
-const STATIC_TESTI = [
-  { name:"Priya S.",  city:"Mumbai",    text:"The Rani Haar set was exactly what I dreamed of. The craftsmanship is unlike anything I've seen. Every guest asked where it was from.", rating:5, set:"Rani Haar Bridal Set",      img:"https://picsum.photos/80/80?random=301" },
-  { name:"Aarti M.",  city:"Delhi",     text:"I wore the Kundan Polki set for my sangeet and I've never felt more beautiful. My mother cried when she saw me in it.",                 rating:5, set:"Kundan Polki Necklace Set", img:"https://picsum.photos/80/80?random=302" },
-  { name:"Sneha R.",  city:"Bangalore", text:"The diamond mangalsutra is perfect — modern yet traditional. I wear it every single day and get compliments constantly.",                rating:5, set:"Diamond Mangalsutra",       img:"https://picsum.photos/80/80?random=303" },
-];
 
 /* ════════════════════════════════════════
    HELPERS
@@ -68,9 +47,9 @@ function apiToSet(p) {
     name:          p.name,
     sub:           (p.description || "").slice(0, 65) + ((p.description?.length || 0) > 65 ? "…" : ""),
     occasion:      (p.occasion || []).map(o => o.toLowerCase()),
-    tag:           `${p.metal?.purity || ""} ${p.metal?.type || "Gold"}`.trim(),
-    metal:         `${p.metal?.purity || ""} ${p.metal?.type || "Gold"}`.trim(),
-    weight:        p.metal?.weight ? `${p.metal.weight} g` : "—",
+    tag:           p.imitation?.plating || "Imitation",
+    metal:         [p.imitation?.plating, p.imitation?.baseMaterial].filter(Boolean).join(" · ") || "Imitation",
+    weight:        p.imitation?.style || "—",      // "weight" slot ab Style dikhata hai
     pieces:        p.pieces || 1,
     piecesList:    p.piecesList || p.category || "",
     price:         p.price?.current  || 0,
@@ -174,8 +153,8 @@ function FeaturedCard({ set, wishlisted, onWish, onAddCart, addingId }) {
         <p className="wb-featured-desc">{set.description}</p>
 
         <div className="wb-featured-specs">
-          <div className="wb-featured-spec"><p className="wb-featured-spec-label">Metal</p><p className="wb-featured-spec-val">{set.metal}</p></div>
-          <div className="wb-featured-spec"><p className="wb-featured-spec-label">Gross Weight</p><p className="wb-featured-spec-val">{set.weight}</p></div>
+          <div className="wb-featured-spec"><p className="wb-featured-spec-label">Finish</p><p className="wb-featured-spec-val">{set.metal}</p></div>
+          <div className="wb-featured-spec"><p className="wb-featured-spec-label">Style</p><p className="wb-featured-spec-val">{set.weight}</p></div>
           <div className="wb-featured-spec"><p className="wb-featured-spec-label">Pieces</p><p className="wb-featured-spec-val">{set.pieces} pc</p></div>
         </div>
 
@@ -589,7 +568,7 @@ export default function WeddingPage() {
               <em>{slide?.em}</em>
             </h1>
             <p className="wb-hero-desc">
-              {slide?.subtitle || "Handcrafted in 22KT & 18KT gold, set with the finest diamonds, emeralds, and pearls."}
+              {slide?.subtitle || "Bridal imitation jewellery sets for every function."}
             </p>
             <div className="wb-hero-btns">
               <a href="#collections" className="wb-hero-btn-primary">{slide?.ctaLabel||"Explore Collections"} <ArrowRight size={14}/></a>
@@ -751,8 +730,8 @@ export default function WeddingPage() {
             <h2 className="wb-cta-title">Book a <em>Private</em><br/>Bridal Consultation</h2>
             <div className="wb-cta-divider"/>
             <p className="wb-cta-sub">
-              Visit any MANAS store for a dedicated bridal session. Our specialists will help you
-              curate the perfect set for every ceremony — at your pace, in complete privacy.
+              Visit {SITE.name} or get in touch for help choosing a bridal set
+              for every ceremony.
             </p>
             <div className="wb-cta-btns">
               <Link href="/contact" className="wb-cta-btn-a">Book Appointment <ArrowRight size={13}/></Link>

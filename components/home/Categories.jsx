@@ -1,15 +1,13 @@
+import { SITE } from "@/config/site";
 import TitleSection from "../common/TitleSection";
 import ImageCard from "../common/ImageCard";
 
-const categoriesData = [
-  { id: 1, title: "Rings", imgUrl: "https://www.tanishq.co.in/dw/image/v2/BKCK_PRD/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dw2562a9fe/homepage/shopByCategory/rings-cat.jpg", link: "/listing?category=Ring" },
-  { id: 2, title: "Earrings", imgUrl: "https://www.tanishq.co.in/dw/image/v2/BKCK_PRD/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dw2562a9fe/homepage/shopByCategory/earrings-cat.jpg", link: "/listing?category=Earring" },
-  { id: 3, title: "Necklaces", imgUrl: "https://www.tanishq.co.in/dw/image/v2/BKCK_PRD/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dw2562a9fe/homepage/shopByCategory/necklaces-cat.jpg", link: "/listing?category=Necklace" },
-  { id: 4, title: "Bracelets", imgUrl: "https://www.tanishq.co.in/dw/image/v2/BKCK_PRD/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dw2562a9fe/homepage/shopByCategory/bracelets-cat.jpg", link: "/listing?category=Bracelet" },
-  { id: 5, title: "Bangles", imgUrl: "https://www.tanishq.co.in/dw/image/v2/BKCK_PRD/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dw2562a9fe/homepage/shopByCategory/bangles-cat.jpg", link: "/listing?category=Bangle" },
-  { id: 6, title: "Mangalsutra", imgUrl: "https://www.tanishq.co.in/dw/image/v2/BKCK_PRD/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dw2562a9fe/homepage/shopByCategory/mangalsutra-cat.jpg", link: "/listing?category=Mangalsutra" },
-  { id: 7, title: "Pendants", imgUrl: "https://www.tanishq.co.in/dw/image/v2/BKCK_PRD/on/demandware.static/-/Library-Sites-TanishqSharedLibrary/default/dw2562a9fe/homepage/shopByCategory/pendants-cat.jpg", link: "/listing?category=Pendant" },
-];
+const categoriesData = SITE.categories.slice(0, 8).map((c, i) => ({
+  id: i + 1,
+  title: c.label,
+  imgUrl: `https://picsum.photos/seed/lakshmi-cat-${i}/400/400`,
+  link: `/listing?category=${encodeURIComponent(c.value)}`,
+}));
 
 // const Categories = () => (
 //   <>
